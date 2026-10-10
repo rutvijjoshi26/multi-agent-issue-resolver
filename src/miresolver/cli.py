@@ -1,16 +1,30 @@
 import argparse
 import asyncio
+import json
 import os
 import sys
+from dataclasses import asdict
 from pathlib import Path
 from typing import Protocol
 from urllib.parse import urlsplit, urlunsplit
 
 import psycopg
 from qdrant_client import QdrantClient
-from qdrant_client.http.exceptions import ApiException
+from qdrant_client.http.exceptions import ApiException, ResponseHandlingException
+
+from miresolver import runtime
+from miresolver.agents.graph import build_graph, resolve
+from miresolver.agents.types import NewIssue, Resolution, ResolverOptions
+from miresolver.code.reader import CodeReadError
 
 from miresolver.config import Config, ConfigError, load_config, read_dotenv
+from miresolver.evaluation.corpus import load_issue_text
+from miresolver.evaluation.runner import (
+    EvaluationError,
+    estimate_cost,
+    run_evaluation,
+    select_cases,
+)
 from miresolver.github import GitHubClient
 from miresolver.manifest import (
     Manifest,
@@ -18,6 +32,7 @@ from miresolver.manifest import (
     build_manifest,
     manifest_to_json,
 )
+from miresolver.models.chat import ChatError
 from miresolver.models.embedding import EmbeddingError
 from miresolver.models.factory import build_embedder
 from miresolver.models.settings import ModelConfigError, load_model_settings
@@ -29,6 +44,10 @@ from miresolver.store import create_schema, save_issues
 
 DEFAULT_MODELS_PATH = Path("config/models.yaml")
 DEFAULT_QDRANT_URL = "http://localhost:6333"
+DEFAULT_MANIFEST_PATH = Path("eval/manifest.json")
+DEFAULT_RESULTS_ROOT = Path("eval/results")
+DEFAULT_CODE_CACHE = Path(".cache/code")
+DEFAULT_MAX_COST = 3.0
 
 
 class IssueClient(Protocol):
@@ -208,6 +227,190 @@ def _run_search(args: argparse.Namespace) -> int:
     return 0
 
 
+def _env() -> dict[str, str]:
+    return {**read_dotenv(), **os.environ}
+
+
+def _load_case_texts(
+    database_url: str, numbers: list[int]
+) -> dict[int, tuple[str, str]]:
+    with psycopg.connect(database_url, autocommit=True) as conn:
+        return load_issue_text(conn, numbers)
+
+
+def _database_url(env: dict[str, str], command: str) -> str:
+    url = env.get("DATABASE_URL")
+    if not url:
+        raise ConfigError(
+            f"DATABASE_URL is required: {command} reads issue text from the "
+            f"Postgres corpus"
+        )
+    return url
+
+
+def _options(args: argparse.Namespace) -> ResolverOptions:
+    return ResolverOptions(
+        retrieve_k=args.retrieve_k,
+        investigate_n=args.investigators,
+        abstain_threshold=args.abstain_threshold,
+        investigator_timeout_s=args.investigator_timeout,
+    )
+
+
+def _runtime_kwargs(args: argparse.Namespace, settings, env) -> dict:
+    return dict(
+        qdrant_url=args.qdrant_url,
+        collection=_resolve_collection(args, settings),
+        repo=args.repo or env.get("TARGET_REPO", "microsoft/vscode"),
+        local_repo=args.local_repo,
+        code_cache=args.code_cache,
+        options=_options(args),
+    )
+
+
+def _resolution_json(res: Resolution) -> dict:
+    return {
+        "abstained": res.abstained,
+        "abstain_reason": res.abstain_reason,
+        "confidence": res.confidence,
+        "files": list(res.files),
+        "approach": res.approach,
+        "citations": [asdict(c) for c in res.citations],
+        "verdicts": [
+            {"issue_number": v.issue_number, "applies": v.applies,
+             "confidence": v.confidence, "files": list(v.files), "error": v.error}
+            for v in res.verdicts
+        ],
+        "tokens": {t: asdict(u) for t, u in res.usage.items()},
+    }
+
+
+def _print_resolution(res: Resolution) -> None:
+    if res.abstained:
+        print(f"No confident match ({res.abstain_reason}).")
+        considered = ", ".join(f"#{v.issue_number}" for v in res.verdicts)
+        if considered:
+            print(f"Precedents investigated and judged insufficient: {considered}")
+        return
+    print(f"Confidence: {res.confidence:.2f}")
+    print("Suggested files, most likely first:")
+    for rank, path in enumerate(res.files, start=1):
+        print(f"  {rank}. {path}")
+    print(f"Approach: {res.approach}")
+    print("Based on:")
+    for c in res.citations:
+        print(f"  #{c.issue_number}, fixed by PR {c.pr_number}")
+
+
+def _run_resolve(args: argparse.Namespace) -> int:
+    settings = _load_models(args.models)
+    env = _env()
+    if args.issue is not None:
+        texts = _load_case_texts(_database_url(env, "resolve --issue"), [args.issue])
+        if args.issue not in texts:
+            print(f"resolve failed: issue {args.issue} is not in the corpus",
+                  file=sys.stderr)
+            return 1
+        title, body = texts[args.issue]
+    elif args.title:
+        title = args.title
+        body = args.body_file.read_text() if args.body_file else (args.body or "")
+    else:
+        print("resolve failed: give an issue title, or --issue NUMBER",
+              file=sys.stderr)
+        return 1
+    issue = NewIssue(title, body, args.base_commit, args.issue)
+
+    async def go() -> Resolution:
+        async with runtime.open_runtime(
+            settings, env, **_runtime_kwargs(args, settings, env)
+        ) as deps:
+            return await resolve(issue, deps)
+
+    res = asyncio.run(go())
+    if args.json:
+        print(json.dumps(_resolution_json(res), indent=2))
+    else:
+        _print_resolution(res)
+    return 0
+
+
+def _run_evaluate(args: argparse.Namespace) -> int:
+    settings = _load_models(args.models)
+    try:
+        manifest = json.loads(args.manifest.read_text())
+    except (OSError, json.JSONDecodeError) as exc:
+        raise EvaluationError(f"cannot read manifest {args.manifest}: {exc}") from exc
+    cases = select_cases(
+        manifest, which=args.set, limit=args.limit, seed=args.seed,
+        allow_full=args.allow_full,
+    )
+    options = _options(args)
+    if args.estimate:
+        print(json.dumps(estimate_cost(len(cases), settings, options), indent=2))
+        return 0
+
+    env = _env()
+    texts = _load_case_texts(
+        _database_url(env, "evaluate"), [c.issue_number for c in cases]
+    )
+    run_meta = {
+        "set": args.set,
+        "seed": args.seed,
+        "limit": args.limit,
+        "manifest": str(args.manifest),
+        "manifest_generated_at": manifest.get("meta", {}).get("generated_at"),
+        "manifest_seed": manifest.get("meta", {}).get("seed"),
+        "options": asdict(options),
+        "estimate": estimate_cost(len(cases), settings, options),
+    }
+
+    async def go() -> Path:
+        async with runtime.open_runtime(
+            settings, env, **_runtime_kwargs(args, settings, env)
+        ) as deps:
+            graph = build_graph(deps)
+
+            async def resolver(issue, exclude):
+                return await resolve(issue, deps, exclude=exclude, graph=graph)
+
+            return await run_evaluation(
+                cases, issue_text=texts.get, resolver=resolver, settings=settings,
+                out_root=args.out_root, run_meta=run_meta, max_cost=args.max_cost,
+                progress=lambda line: print(line, file=sys.stderr, flush=True),
+            )
+
+    out_dir = asyncio.run(go())
+    summary = json.loads((out_dir / "summary.json").read_text())
+    metrics = summary["metrics"]
+    print(f"results written to {out_dir}")
+    print(f"scored {summary['counts']['scored']} of {summary['counts']['selected']} cases")
+    print(f"hit@3 (all cases): {metrics['all_cases']['hit_at_3']}")
+    print(f"abstention rate: {metrics['abstention_rate']}")
+    print(f"accuracy when answering: {metrics['accuracy_when_answering']}")
+    print(f"priced spend: ${summary['spend']['priced_total']}")
+    return 0
+
+
+def _add_runtime_flags(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--models", type=Path, default=DEFAULT_MODELS_PATH)
+    parser.add_argument("--qdrant-url", default=DEFAULT_QDRANT_URL)
+    parser.add_argument("--collection", default=None)
+    parser.add_argument(
+        "--repo", default=None,
+        help="owner/name whose code is read; defaults to TARGET_REPO or microsoft/vscode",
+    )
+    parser.add_argument(
+        "--local-repo", type=Path, default=None,
+        help="read code from this local clone with git instead of fetching it",
+    )
+    parser.add_argument("--code-cache", type=Path, default=DEFAULT_CODE_CACHE)
+    parser.add_argument("--retrieve-k", type=int, default=10)
+    parser.add_argument("--investigators", type=int, default=3)
+    parser.add_argument("--abstain-threshold", type=float, default=0.5)
+    parser.add_argument("--investigator-timeout", type=float, default=90.0)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="miresolver")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -254,7 +457,64 @@ def main(argv: list[str] | None = None) -> int:
     )
     search_cmd.add_argument("--limit", type=int, default=10)
 
+    resolve_cmd = sub.add_parser(
+        "resolve", help="suggest files and an approach for one bug report"
+    )
+    resolve_cmd.add_argument("title", nargs="?", default=None)
+    resolve_cmd.add_argument("--body", default=None)
+    resolve_cmd.add_argument("--body-file", type=Path, default=None)
+    resolve_cmd.add_argument(
+        "--issue", type=int, default=None,
+        help="read title and body of this issue from the Postgres corpus",
+    )
+    resolve_cmd.add_argument(
+        "--base-commit", required=True,
+        help="commit whose code the investigators read",
+    )
+    resolve_cmd.add_argument("--json", action="store_true")
+    _add_runtime_flags(resolve_cmd)
+
+    eval_cmd = sub.add_parser(
+        "evaluate", help="score the resolver against the manifest answer key"
+    )
+    eval_cmd.add_argument("--set", choices=("dev", "full"), default="dev")
+    eval_cmd.add_argument("--limit", type=int, default=None)
+    eval_cmd.add_argument("--seed", type=int, default=20260921)
+    eval_cmd.add_argument("--allow-full", action="store_true")
+    eval_cmd.add_argument("--max-cost", type=float, default=DEFAULT_MAX_COST)
+    eval_cmd.add_argument("--estimate", action="store_true")
+    eval_cmd.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST_PATH)
+    eval_cmd.add_argument("--out-root", type=Path, default=DEFAULT_RESULTS_ROOT)
+    _add_runtime_flags(eval_cmd)
+
     args = parser.parse_args(argv)
+
+    if args.command in ("resolve", "evaluate"):
+        try:
+            if args.command == "resolve":
+                return _run_resolve(args)
+            return _run_evaluate(args)
+        except (
+            ModelConfigError, EmbeddingError, ConfigError, ChatError,
+            EvaluationError, CodeReadError,
+        ) as exc:
+            print(f"{args.command} failed: {exc}", file=sys.stderr)
+            return 1
+        except (ApiException, ResponseHandlingException) as exc:
+            print(
+                f"{args.command} failed: cannot reach Qdrant at "
+                f"{_redact_url(args.qdrant_url)}: {exc}. Is it running? "
+                f"Try `docker compose up -d qdrant`.",
+                file=sys.stderr,
+            )
+            return 1
+        except psycopg.OperationalError as exc:
+            print(
+                f"{args.command} failed: cannot connect to Postgres: {exc}. "
+                f"Is it running? Try `docker compose up -d postgres`.",
+                file=sys.stderr,
+            )
+            return 1
 
     if args.command in ("index", "search"):
         try:

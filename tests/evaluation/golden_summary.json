@@ -1,0 +1,26 @@
+{
+  "abstention_rate": 0.4,
+  "accuracy_when_answering": 0.6667,
+  "all_cases": {
+    "cases": 5,
+    "hit_at_1": 0.4,
+    "hit_at_3": 0.6,
+    "precision_at_3": 0.5,
+    "recall_at_3": 0.6
+  },
+  "answered": {
+    "cases": 3,
+    "hit_at_1": 0.3333,
+    "hit_at_3": 0.6667,
+    "precision_at_3": 0.5,
+    "recall_at_3": 0.6667
+  },
+  "cases": 5,
+  "confident_wrong_rate": 0.2,
+  "correct_abstention_rate": 0.5,
+  "latency_s": {
+    "median": 3.0,
+    "p95": 5.0
+  },
+  "precedent_available_rate": 0.6
+}
