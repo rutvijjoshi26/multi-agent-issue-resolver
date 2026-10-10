@@ -24,6 +24,7 @@ from miresolver.agents.investigate import INVESTIGATE_MAX_TOKENS
 from miresolver.agents.screen import SCREEN_MAX_TOKENS
 from miresolver.agents.synthesize import SYNTHESIZE_MAX_TOKENS
 from miresolver.agents.types import Candidate, NewIssue, Resolution, ResolverOptions
+from miresolver.benchmark import digest_cases
 from miresolver.evaluation.metrics import score_case, summarize
 from miresolver.manifest import EvalCase
 from miresolver.models.chat import Usage
@@ -51,15 +52,18 @@ def select_cases(
     limit: int | None,
     seed: int,
     allow_full: bool = False,
+    allow_test: bool = False,
 ) -> list[EvalCase]:
     """Pick the cases to run, reproducibly.
 
     A limit draws a seeded sample, sorted by issue number, so the same seed
     always names the same subset. The full set needs allow_full, so a large
-    paid run cannot start by accident.
+    paid run cannot start by accident. The held-out test set needs
+    allow_test, always runs whole, and is checked against the digest
+    recorded when it was frozen.
     """
-    if which not in ("dev", "full"):
-        raise EvaluationError(f"unknown case set {which!r}; use dev or full")
+    if which not in ("dev", "full", "test"):
+        raise EvaluationError(f"unknown case set {which!r}; use dev, test or full")
     if limit is not None and limit < 1:
         raise EvaluationError(f"--limit must be at least 1, got {limit}")
     if which == "full" and not allow_full:
@@ -67,6 +71,25 @@ def select_cases(
             "refusing to run the full set without --allow-full; it is the "
             "published run and the most expensive one"
         )
+    if which == "test":
+        if not allow_test:
+            raise EvaluationError(
+                "refusing to run the held-out test set without --final; it is "
+                "run once per mode with the final configuration, never for tuning"
+            )
+        if limit is not None:
+            raise EvaluationError(
+                "the held-out test set always runs whole; drop --limit"
+            )
+    if which not in manifest:
+        raise EvaluationError(f"this manifest has no {which!r} set")
+    if which == "test":
+        recorded = manifest.get("meta", {}).get("test_sha256")
+        if recorded is not None and digest_cases(manifest["test"]) != recorded:
+            raise EvaluationError(
+                "the test set no longer matches the digest recorded when it "
+                "was frozen; refusing to score an edited test set"
+            )
     cases = [
         EvalCase(
             issue_number=int(c["issue_number"]),

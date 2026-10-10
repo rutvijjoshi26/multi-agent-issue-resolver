@@ -63,24 +63,16 @@ class ManifestSizeError(ValueError):
     """
 
 
-def build_manifest(
-    issues: Sequence[CandidateIssue],
-    prs: Mapping[int, CandidatePR],
-    *,
-    repo: str,
-    limit: int,
-    dev_size: int,
-    full_size: int,
-    seed: int,
-    allow_undersized: bool = False,
-    generated_at: str | None = None,
-) -> Manifest:
-    if dev_size >= full_size:
-        raise ManifestSizeError("dev_size must be strictly less than full_size")
+def eligible_cases(
+    issues: Sequence[CandidateIssue], prs: Mapping[int, CandidatePR]
+) -> tuple[list[EvalCase], Counter[str]]:
+    """Every eligible case, in issue-number order, and rejections by reason.
 
+    The single place eligibility and the answer key are derived, shared by
+    every manifest version so they cannot drift apart.
+    """
     eligible: list[EvalCase] = []
     rejected: Counter[str] = Counter()
-
     for issue in sorted(issues, key=lambda i: i.number):
         verdict = is_eligible(issue, prs)
         if not verdict.eligible:
@@ -97,6 +89,25 @@ def build_manifest(
                 changed_files=source_files(pr.changed_files),
             )
         )
+    return eligible, rejected
+
+
+def build_manifest(
+    issues: Sequence[CandidateIssue],
+    prs: Mapping[int, CandidatePR],
+    *,
+    repo: str,
+    limit: int,
+    dev_size: int,
+    full_size: int,
+    seed: int,
+    allow_undersized: bool = False,
+    generated_at: str | None = None,
+) -> Manifest:
+    if dev_size >= full_size:
+        raise ManifestSizeError("dev_size must be strictly less than full_size")
+
+    eligible, rejected = eligible_cases(issues, prs)
 
     undersized = len(eligible) < full_size
     if undersized and not allow_undersized:

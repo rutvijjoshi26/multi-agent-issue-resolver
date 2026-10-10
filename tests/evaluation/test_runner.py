@@ -202,3 +202,41 @@ def test_each_case_line_records_its_unmetered_calls(tmp_path):
 
     out = run(cases, resolver, tmp_path)
     assert json.loads((out / "cases.jsonl").read_text())["unmetered_calls"] == 1
+
+
+V2 = {
+    "dev": MANIFEST["dev"],
+    "test": [{"issue_number": n, "pr_number": n + 1000, "base_commit": "b" * 40,
+              "changed_files": [f"src/{n}.ts"]} for n in range(100, 110)],
+    "meta": {"version": 2, "seed": 3},
+}
+
+
+def test_the_held_out_test_set_is_refused_unless_this_is_the_final_run():
+    with pytest.raises(EvaluationError, match="--final"):
+        select_cases(V2, which="test", limit=None, seed=0)
+    cases = select_cases(V2, which="test", limit=None, seed=0, allow_test=True)
+    assert [c.issue_number for c in cases] == list(range(100, 110))
+
+
+def test_the_final_run_takes_the_whole_test_set():
+    with pytest.raises(EvaluationError, match="whole"):
+        select_cases(V2, which="test", limit=5, seed=0, allow_test=True)
+
+
+def test_a_set_the_manifest_lacks_is_reported():
+    with pytest.raises(EvaluationError, match="no 'test' set"):
+        select_cases(MANIFEST, which="test", limit=None, seed=0, allow_test=True)
+    with pytest.raises(EvaluationError, match="no 'full' set"):
+        select_cases(V2, which="full", limit=None, seed=0, allow_full=True)
+
+
+def test_a_test_set_that_no_longer_matches_its_digest_is_refused():
+    from miresolver.benchmark import digest_cases
+
+    manifest = json.loads(json.dumps(V2))
+    manifest["meta"]["test_sha256"] = digest_cases(manifest["test"])
+    assert select_cases(manifest, which="test", limit=None, seed=0, allow_test=True)
+    manifest["test"][0]["changed_files"] = ["src/other.ts"]
+    with pytest.raises(EvaluationError, match="digest"):
+        select_cases(manifest, which="test", limit=None, seed=0, allow_test=True)

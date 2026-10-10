@@ -1,0 +1,1908 @@
+{
+  "dev": [
+    {
+      "base_commit": "50f38b988ce1dd2482b4702a82d61375158cb352",
+      "changed_files": [
+        "src/vs/workbench/contrib/files/browser/explorerService.ts",
+        "src/vs/workbench/services/contextmenu/electron-browser/contextmenuService.ts"
+      ],
+      "issue_number": 143968,
+      "pr_number": 336664
+    },
+    {
+      "base_commit": "d9a2de88715e4e477e83d25a49f523dd67f8999b",
+      "changed_files": [
+        "src/vs/editor/common/cursor/cursor.ts"
+      ],
+      "issue_number": 205598,
+      "pr_number": 338349
+    },
+    {
+      "base_commit": "f17f870cdf209a5507cedbc07da7ecdd6ca216d7",
+      "changed_files": [
+        "src/vs/workbench/api/browser/mainThreadEditorTabs.ts"
+      ],
+      "issue_number": 228367,
+      "pr_number": 333186
+    },
+    {
+      "base_commit": "d0d36cddefd72982a79751e444db80a46d717b49",
+      "changed_files": [
+        "src/vs/base/browser/ui/list/listWidget.ts"
+      ],
+      "issue_number": 261295,
+      "pr_number": 330945
+    },
+    {
+      "base_commit": "1f3a8b47a0ebe425bc80c276ddf93b598f1c3160",
+      "changed_files": [
+        "src/vs/editor/browser/controller/editContext/native/nativeEditContext.ts"
+      ],
+      "issue_number": 262473,
+      "pr_number": 310901
+    },
+    {
+      "base_commit": "38fbd7711c6cb70fa1e37ed575b1af81a903fb63",
+      "changed_files": [
+        "package.json"
+      ],
+      "issue_number": 281873,
+      "pr_number": 282079
+    },
+    {
+      "base_commit": "dda8a0d50344154d6539975927807b6555a26109",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/electron-browser/actions/chatExportZip.ts"
+      ],
+      "issue_number": 299889,
+      "pr_number": 338253
+    },
+    {
+      "base_commit": "5e9e343c80822854a265f38be2f30fa61f57811a",
+      "changed_files": [
+        "src/extension/chatSessions/copilotcli/node/copilotCliBridgeSpanProcessor.ts",
+        "src/extension/chatSessions/copilotcli/node/copilotcliSession.ts",
+        "src/extension/trajectory/vscode-node/otelSpanToChatDebugEvent.ts"
+      ],
+      "issue_number": 304192,
+      "pr_number": 4616
+    },
+    {
+      "base_commit": "09b07fe4007df5c64c1be692efdbb27eb874e06a",
+      "changed_files": [
+        "src/vs/platform/networkFilter/common/domainMatcher.ts"
+      ],
+      "issue_number": 314339,
+      "pr_number": 331063
+    },
+    {
+      "base_commit": "8494c0d78e18e281f4fd255d8bc3801cafd51638",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/tools/languageModelToolsService.ts"
+      ],
+      "issue_number": 321150,
+      "pr_number": 329782
+    },
+    {
+      "base_commit": "d912aa0ec55e578a95a65b39e7fd112d317dfdc6",
+      "changed_files": [
+        "src/vs/sessions/electron-browser/actions/vscodeActions.ts",
+        "src/vs/workbench/contrib/chat/electron-browser/agentSessions/agentSessionsActions.ts"
+      ],
+      "issue_number": 321321,
+      "pr_number": 337869
+    },
+    {
+      "base_commit": "9e790fa095410d9c8544d6cdd403516d7a0e4a61",
+      "changed_files": [
+        "src/vs/editor/common/services/semanticTokensProviderStyling.ts",
+        "src/vs/editor/contrib/semanticTokens/browser/documentSemanticTokens.ts"
+      ],
+      "issue_number": 322571,
+      "pr_number": 322575
+    },
+    {
+      "base_commit": "e6e8b42c8af1bad2b5629fa75a66f45fc2aa464b",
+      "changed_files": [
+        "package.json"
+      ],
+      "issue_number": 322904,
+      "pr_number": 340164
+    },
+    {
+      "base_commit": "f292f203cb19234cceb0e0e9e3628f88e9cf0602",
+      "changed_files": [
+        "src/vs/platform/browserView/electron-main/browserView.ts"
+      ],
+      "issue_number": 323460,
+      "pr_number": 323637
+    },
+    {
+      "base_commit": "71a83f43ef275a9adc01278e75a13915cf46e686",
+      "changed_files": [
+        "src/vs/sessions/contrib/providers/agentHost/browser/media/openSubagentChat.css",
+        "src/vs/workbench/contrib/chat/browser/widget/chatContentParts/chatSubagentContentPart.ts",
+        "src/vs/workbench/contrib/chat/browser/widget/chatContentParts/media/chatSubagentContent.css"
+      ],
+      "issue_number": 324101,
+      "pr_number": 324104
+    },
+    {
+      "base_commit": "16d5afb57f4b524e26b52db6724fcb62b7f6ee45",
+      "changed_files": [
+        "src/vs/workbench/browser/parts/activitybar/activitybarPart.ts",
+        "src/vs/workbench/contrib/styleOverrides/browser/media/activityBar.css"
+      ],
+      "issue_number": 324217,
+      "pr_number": 324488
+    },
+    {
+      "base_commit": "48e0a1001c84e999bc3f898c773d4d88bc91c1ef",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/copilot/copilotAgentSession.ts"
+      ],
+      "issue_number": 324277,
+      "pr_number": 324563
+    },
+    {
+      "base_commit": "77017049f656c449dc5ad88dd175ed4250c06986",
+      "changed_files": [
+        "src/vs/editor/browser/widget/multiDiffEditor/style.css"
+      ],
+      "issue_number": 324597,
+      "pr_number": 324819
+    },
+    {
+      "base_commit": "5967db4487c7d4e9df4e4d7ab2395169a514262d",
+      "changed_files": [
+        ".npmrc",
+        "cgmanifest.json",
+        "package.json"
+      ],
+      "issue_number": 324639,
+      "pr_number": 327764
+    },
+    {
+      "base_commit": "3c97b1c9f6ede65da255faeba4a6338d006f2ffd",
+      "changed_files": [
+        "src/vs/workbench/contrib/styleOverrides/browser/media/fontRamp.css"
+      ],
+      "issue_number": 324642,
+      "pr_number": 325013
+    },
+    {
+      "base_commit": "b38a336463cf9aaed6a162d67fcf6fb49e9b21d0",
+      "changed_files": [
+        "src/vs/platform/actionWidget/browser/actionList.ts"
+      ],
+      "issue_number": 324770,
+      "pr_number": 327553
+    },
+    {
+      "base_commit": "f16275c785397e2e4c91d1f1e9e1354475668a0a",
+      "changed_files": [
+        "src/vs/workbench/contrib/styleOverrides/browser/media/editorBorder.css"
+      ],
+      "issue_number": 324785,
+      "pr_number": 324912
+    },
+    {
+      "base_commit": "f6da384d3f4c3aecbc5c562c9198cd6f44fe034f",
+      "changed_files": [
+        "src/vs/workbench/contrib/styleOverrides/browser/media/tabs.css"
+      ],
+      "issue_number": 325246,
+      "pr_number": 325291
+    },
+    {
+      "base_commit": "d10e4326534a9c1a26fcb3e43a69b9bfecb6fa32",
+      "changed_files": [
+        "src/vs/platform/agentHost/common/state/sessionState.ts",
+        "src/vs/platform/agentHost/node/agentSideEffects.ts"
+      ],
+      "issue_number": 325631,
+      "pr_number": 325679
+    },
+    {
+      "base_commit": "53e335d0387969ba6b6bd68f2481be89252089ca",
+      "changed_files": [
+        "src/vs/workbench/contrib/styleOverrides/browser/media/activityBar.css"
+      ],
+      "issue_number": 325666,
+      "pr_number": 325801
+    },
+    {
+      "base_commit": "dcbb2412bb637a4db482f4f40633feb5c09214ad",
+      "changed_files": [
+        "src/vs/workbench/services/themes/browser/workbenchThemeService.ts",
+        "src/vs/workbench/services/themes/common/themeConfiguration.ts"
+      ],
+      "issue_number": 325967,
+      "pr_number": 327186
+    },
+    {
+      "base_commit": "f7b500c0e0af5e9e10765921dc4431b36012e803",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostSessionHandler.ts"
+      ],
+      "issue_number": 326007,
+      "pr_number": 326022
+    },
+    {
+      "base_commit": "e08ca7bd81f16aa87eefc50d55d6e7c1a07982f4",
+      "changed_files": [
+        "src/vs/platform/agentHost/common/githubEndpoints.ts",
+        "src/vs/platform/agentHost/node/copilot/copilotAgentSession.ts"
+      ],
+      "issue_number": 326073,
+      "pr_number": 326183
+    },
+    {
+      "base_commit": "a84454ca354d88804f6d4312eda4e92095784fb3",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/widget/chatListRenderer.ts",
+        "src/vs/workbench/contrib/chat/browser/widget/media/chat.css"
+      ],
+      "issue_number": 326459,
+      "pr_number": 326454
+    },
+    {
+      "base_commit": "17d03ae85fc2d890c6330f23397e5ad14c16bce4",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/speechToText/chatSpeechToTextService.ts"
+      ],
+      "issue_number": 326672,
+      "pr_number": 326673
+    },
+    {
+      "base_commit": "85409d2429cdacae138d86680831000ae35de8c3",
+      "changed_files": [
+        "src/vs/sessions/contrib/chat/browser/media/chatInput.css"
+      ],
+      "issue_number": 326932,
+      "pr_number": 327150
+    },
+    {
+      "base_commit": "6d4a6d2103b4a0028f57793ad8d98d10f31b8054",
+      "changed_files": [
+        "src/vs/platform/agentHost/common/copilotHome.ts",
+        "src/vs/platform/agentHost/node/copilot/copilotAgent.ts",
+        "src/vs/workbench/contrib/browserView/electron-browser/browserViewWorkbenchService.ts"
+      ],
+      "issue_number": 327028,
+      "pr_number": 327034
+    },
+    {
+      "base_commit": "8494c0d78e18e281f4fd255d8bc3801cafd51638",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/tools/languageModelToolsService.ts"
+      ],
+      "issue_number": 327109,
+      "pr_number": 329782
+    },
+    {
+      "base_commit": "c6fc5a925b1615adb898a362885d521775a8dcb9",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/copilot/copilotAgent.ts"
+      ],
+      "issue_number": 327125,
+      "pr_number": 327126
+    },
+    {
+      "base_commit": "ed20a845f85e9c09090b22cc2f538dceb78081ff",
+      "changed_files": [
+        "src/vs/workbench/contrib/mcp/common/mcpServer.ts"
+      ],
+      "issue_number": 327148,
+      "pr_number": 327151
+    },
+    {
+      "base_commit": "cacc795ddec558ce1fc186ed8bf62316830aba86",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/agentSideEffects.ts",
+        "src/vs/platform/agentHost/node/shared/persistSessionMetadata.ts"
+      ],
+      "issue_number": 327435,
+      "pr_number": 327450
+    },
+    {
+      "base_commit": "01f7bd302b76743c931274eae77cf604498e30cb",
+      "changed_files": [
+        "src/vs/platform/hover/browser/hoverWidget.ts"
+      ],
+      "issue_number": 327517,
+      "pr_number": 331439
+    },
+    {
+      "base_commit": "9361d8d050734220bb20a37aa05669a1a9bc300f",
+      "changed_files": [
+        "src/vs/workbench/contrib/mcp/common/mcpRegistry.ts"
+      ],
+      "issue_number": 327627,
+      "pr_number": 329774
+    },
+    {
+      "base_commit": "26230ed9b5f694b93fb2b33ab1241fac6a8e13de",
+      "changed_files": [
+        "extensions/copilot/src/platform/endpoint/node/messagesApi.ts"
+      ],
+      "issue_number": 327646,
+      "pr_number": 328157
+    },
+    {
+      "base_commit": "2e5d444ab4b14b568798251cfbdc7cf54ae125de",
+      "changed_files": [
+        "build/gulpfile.vscode.win32.ts",
+        "build/win32/code.iss"
+      ],
+      "issue_number": 327904,
+      "pr_number": 327905
+    },
+    {
+      "base_commit": "25b78bb3d67d3d87f4063b452ef4a695e85a90f6",
+      "changed_files": [
+        "src/vs/sessions/contrib/agentFeedback/browser/agentFeedbackService.ts",
+        "src/vs/workbench/contrib/chat/browser/chat.ts",
+        "src/vs/workbench/contrib/chat/browser/widget/chatWidget.ts"
+      ],
+      "issue_number": 328177,
+      "pr_number": 328378
+    },
+    {
+      "base_commit": "25b1304d168d1a916dd9b12ab0ce4b18b7b2a7ca",
+      "changed_files": [
+        "src/vs/base/browser/ui/contextview/contextview.ts"
+      ],
+      "issue_number": 328190,
+      "pr_number": 329327
+    },
+    {
+      "base_commit": "c90abb2b382575318375dd47bd0d8c909674e19d",
+      "changed_files": [
+        "src/vs/base/browser/ui/inputbox/inputBox.ts"
+      ],
+      "issue_number": 328286,
+      "pr_number": 328412
+    },
+    {
+      "base_commit": "94de33c54eec333997bea423b31dad8f6f9f3c22",
+      "changed_files": [
+        "src/vs/platform/agentHost/common/agentHostByokLm.ts",
+        "src/vs/platform/agentHost/node/byokLmBridgeRegistry.ts",
+        "src/vs/platform/agentHost/node/copilot/copilotAgent.ts",
+        "src/vs/platform/agentHost/node/copilot/copilotSessionLauncher.ts",
+        "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostByokLmHandler.ts"
+      ],
+      "issue_number": 328336,
+      "pr_number": 328431
+    },
+    {
+      "base_commit": "7c840591bedab7e4925855ace857cac4b730114f",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/speechToText/dictationSession.ts",
+        "src/vs/workbench/contrib/chat/browser/speechToText/media/dictationSession.css"
+      ],
+      "issue_number": 328345,
+      "pr_number": 328428
+    },
+    {
+      "base_commit": "d124124141f6e6d738236a6ec0077a45d490166c",
+      "changed_files": [
+        "src/vs/base/browser/ui/dialog/dialog.ts"
+      ],
+      "issue_number": 328743,
+      "pr_number": 328788
+    },
+    {
+      "base_commit": "cee4edd90080d792b83fd42e31c93eb13603e64e",
+      "changed_files": [
+        "src/vs/platform/browserView/electron-browser/preload-browserView.ts",
+        "src/vs/workbench/contrib/browserView/electron-browser/features/browserEditorChatFeatures.ts"
+      ],
+      "issue_number": 328793,
+      "pr_number": 329072
+    },
+    {
+      "base_commit": "56483175c37c4b0f28d6862ea2288c8ebf90e324",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/commandAutoApprover.ts",
+        "src/vs/platform/terminal/common/autoApprove/gitAutoApproveRules.ts",
+        "src/vs/workbench/contrib/terminalContrib/chatAgentTools/common/terminalChatAgentToolsConfiguration.ts"
+      ],
+      "issue_number": 329029,
+      "pr_number": 329026
+    },
+    {
+      "base_commit": "f269f22eb5d31ebbb153039b15f4914dd174cf5e",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/copilot/copilotAgent.ts",
+        "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostSessionHandler.ts"
+      ],
+      "issue_number": 329223,
+      "pr_number": 334593
+    },
+    {
+      "base_commit": "e390f36f69fe6cdf1c1c3262f0b50f1d01552ec4",
+      "changed_files": [
+        "src/vs/workbench/browser/parts/titlebar/media/titlebarpart.css"
+      ],
+      "issue_number": 329606,
+      "pr_number": 329692
+    },
+    {
+      "base_commit": "2b3436e5ec8776f5435a66b6ecfa52d367022cd8",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/attachments/chatAttachmentWidgets.ts"
+      ],
+      "issue_number": 329610,
+      "pr_number": 331416
+    },
+    {
+      "base_commit": "fa16d826ef240a255dd6fc93a049f7a0b0ac295b",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/copilot/copilotAgentSession.ts",
+        "src/vs/platform/agentHost/node/copilot/mapSessionEvents.ts"
+      ],
+      "issue_number": 329830,
+      "pr_number": 329791
+    },
+    {
+      "base_commit": "c886ff45cda418ad334b7185055b107af31f563d",
+      "changed_files": [
+        "src/vs/platform/agentHost/common/sshConfigParsing.ts",
+        "src/vs/platform/agentHost/common/sshRemoteAgentHost.ts"
+      ],
+      "issue_number": 329938,
+      "pr_number": 330085
+    },
+    {
+      "base_commit": "9d4a057692f3d58898514511d5939199341d7d72",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/shared/agentHostOctoKitService.ts"
+      ],
+      "issue_number": 330072,
+      "pr_number": 330224
+    },
+    {
+      "base_commit": "9aaf3690e440f4898e1187d7e138a610e105ccc8",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/agentHostGitStateService.ts"
+      ],
+      "issue_number": 330316,
+      "pr_number": 330424
+    },
+    {
+      "base_commit": "1e393d7b352de7927a98d0321e51ae63046c8652",
+      "changed_files": [
+        "src/vs/platform/mcp/common/mcpManagementService.ts"
+      ],
+      "issue_number": 330356,
+      "pr_number": 330357
+    },
+    {
+      "base_commit": "17217a0ece98f8bf428343c924d7f25951fea3a7",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/copilot/copilotAgent.ts"
+      ],
+      "issue_number": 330380,
+      "pr_number": 330392
+    },
+    {
+      "base_commit": "b620c9187820cd678e65dfaefd041de8366903ab",
+      "changed_files": [
+        "src/vs/sessions/contrib/providers/agentHost/browser/baseAgentHostSessionsProvider.ts"
+      ],
+      "issue_number": 330531,
+      "pr_number": 330761
+    },
+    {
+      "base_commit": "d7b54b1c18f53d8ca8c7ae41fd8070a615733f4a",
+      "changed_files": [
+        "src/vs/sessions/contrib/changes/browser/changesViewActions.ts"
+      ],
+      "issue_number": 330757,
+      "pr_number": 330924
+    },
+    {
+      "base_commit": "dd4b067306e1082e73af711f874e9dc6fa2b9d8a",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/widget/chatListRenderer.ts"
+      ],
+      "issue_number": 331188,
+      "pr_number": 333179
+    },
+    {
+      "base_commit": "8729180f16cde365377bbedf497c0d96c89f5f31",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/agentHostStateManager.ts",
+        "src/vs/platform/agentHost/node/agentService.ts",
+        "src/vs/platform/agentHost/node/protocolServerHandler.ts"
+      ],
+      "issue_number": 331489,
+      "pr_number": 331394
+    },
+    {
+      "base_commit": "262a87b1f7a5cc81cf2177b1d9f8325b13fef1a3",
+      "changed_files": [
+        "src/vs/sessions/contrib/accountMenu/browser/account.contribution.ts",
+        "src/vs/sessions/contrib/accountMenu/browser/media/accountWidget.css",
+        "src/vs/workbench/contrib/chat/browser/chatStatus/chatStatusDashboard.ts",
+        "src/vs/workbench/contrib/chat/browser/chatStatus/chatStatusEntry.ts",
+        "src/vs/workbench/services/chat/common/chatEntitlementService.ts"
+      ],
+      "issue_number": 331504,
+      "pr_number": 331536
+    },
+    {
+      "base_commit": "2fcde0acde2b4fa6da9893b1779b986922d8cd9d",
+      "changed_files": [
+        ".gitignore",
+        "src/vs/workbench/contrib/chat/browser/widget/input/modelPicker/media/modelPicker.css",
+        "src/vs/workbench/contrib/chat/browser/widget/input/modelPicker/modelPickerWidget.ts"
+      ],
+      "issue_number": 332482,
+      "pr_number": 332554
+    },
+    {
+      "base_commit": "8853be931dfb182c2497ecd99768a9442e4b7019",
+      "changed_files": [
+        "build/lib/preLaunch.ts",
+        "scripts/test.bat",
+        "scripts/test.sh"
+      ],
+      "issue_number": 333136,
+      "pr_number": 333137
+    },
+    {
+      "base_commit": "ec092ceb1fd97a9d87b5563483165daf29233424",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/widget/chatContentParts/chatRequestOriginPart.ts"
+      ],
+      "issue_number": 333482,
+      "pr_number": 334085
+    },
+    {
+      "base_commit": "6ef4956fc6be07b22ca5b5287e8dad455e64c2cb",
+      "changed_files": [
+        "src/vs/sessions/contrib/sessions/browser/media/sessionsList.css"
+      ],
+      "issue_number": 333487,
+      "pr_number": 333741
+    },
+    {
+      "base_commit": "39767fdcf6220e2913489c3ede13dd7f77535237",
+      "changed_files": [
+        "src/vs/sessions/contrib/layout/browser/singlePane/singlePaneDockedTabsCoordinator.ts"
+      ],
+      "issue_number": 333537,
+      "pr_number": 333541
+    },
+    {
+      "base_commit": "44f3c8980170af37fede70f850ec8209f42d6f14",
+      "changed_files": [
+        "src/vs/base/browser/ui/list/listView.ts"
+      ],
+      "issue_number": 333547,
+      "pr_number": 340070
+    },
+    {
+      "base_commit": "048977cfd072356203243c1302c21399449cf425",
+      "changed_files": [
+        "src/vs/editor/browser/widget/diffEditor/components/diffEditorEditors.ts",
+        "src/vs/editor/browser/widget/diffEditor/diffEditorWidget.ts",
+        "src/vs/editor/browser/widget/multiDiffEditor/compressedVirtualizedScrollView.ts",
+        "src/vs/editor/browser/widget/multiDiffEditor/diffEditorItemTemplate.ts",
+        "src/vs/editor/browser/widget/multiDiffEditor/virtualizedItemManager.ts"
+      ],
+      "issue_number": 333586,
+      "pr_number": 333746
+    },
+    {
+      "base_commit": "752a80ff8290c2009d1ac91090dc0ac68b9a9eb9",
+      "changed_files": [
+        "src/vs/sessions/contrib/chat/browser/sessionTypePicker.ts",
+        "src/vs/sessions/contrib/onboardingTours/browser/tours/newSessionViewV2Tour.ts"
+      ],
+      "issue_number": 333605,
+      "pr_number": 333603
+    },
+    {
+      "base_commit": "ac25654006e19a36f53fc7e0eb59bf1366fcc865",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/shared/artifactServerTools.ts",
+        "src/vs/workbench/contrib/chat/browser/accessibility/chatResponseAccessibleView.ts",
+        "src/vs/workbench/contrib/chat/browser/widget/chatContentParts/toolInvocationParts/chatSessionCreatedResultSubPart.ts",
+        "src/vs/workbench/contrib/chat/browser/widget/chatListRenderer.ts"
+      ],
+      "issue_number": 333624,
+      "pr_number": 333645
+    },
+    {
+      "base_commit": "1f02758a9d69e16d15384b1247ea51e17aab2b3f",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/speechToText/chatSpeechToTextService.ts",
+        "src/vs/workbench/contrib/codeEditor/browser/dictation/editorDictation.ts",
+        "src/vs/workbench/contrib/terminalContrib/voice/browser/terminalVoiceActions.ts"
+      ],
+      "issue_number": 333792,
+      "pr_number": 333811
+    },
+    {
+      "base_commit": "33913cb25bd6c0a9fdd6780cabc4b4ad5005aae6",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/speechToText/chatSpeechToTextService.ts",
+        "src/vs/workbench/contrib/chat/browser/speechToText/dictationSession.ts"
+      ],
+      "issue_number": 333832,
+      "pr_number": 333846
+    },
+    {
+      "base_commit": "b0dad94048b3b988c8aa325a46ce7998f2abe0bb",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/attachments/chatDynamicVariables.ts"
+      ],
+      "issue_number": 333941,
+      "pr_number": 333965
+    },
+    {
+      "base_commit": "95754071a22fb4c54a951827168b7b1d13dd7d0a",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/common/plugins/agentPluginEnablement.ts",
+        "src/vs/workbench/contrib/chat/common/plugins/agentPluginServiceImpl.ts",
+        "src/vs/workbench/contrib/mcp/common/discovery/pluginMcpDiscovery.ts"
+      ],
+      "issue_number": 334391,
+      "pr_number": 336655
+    },
+    {
+      "base_commit": "d317de449086384e861abe3b622ddbbfd2a9ca3b",
+      "changed_files": [
+        "src/vs/platform/request/common/request.ts",
+        "src/vs/sessions/contrib/providers/remoteAgentHost/browser/cloudSandboxAgentHostContribution.ts",
+        "src/vs/sessions/contrib/providers/remoteAgentHost/browser/cloudSandboxApiService.ts",
+        "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentCustomizationContentExpander.ts",
+        "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/syncedCustomizationBundler.ts"
+      ],
+      "issue_number": 334441,
+      "pr_number": 334568
+    },
+    {
+      "base_commit": "105fc025e6b644cba51c3660c6c085b1b1717b43",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/widget/chatContentParts/media/chatRichLink.css"
+      ],
+      "issue_number": 334455,
+      "pr_number": 334545
+    },
+    {
+      "base_commit": "60d4e60a337402806fd414692520fe35b6b5ebd3",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/widget/chatContentParts/media/chatCodeBlockPill.css"
+      ],
+      "issue_number": 334621,
+      "pr_number": 335454
+    },
+    {
+      "base_commit": "0f79e0ea335adfbff39f71914a57b9c35bdc72c8",
+      "changed_files": [
+        "webviews/editorWebview/index.css"
+      ],
+      "issue_number": 334797,
+      "pr_number": 8937
+    },
+    {
+      "base_commit": "30645906b5e6f122f2503c64007255d4db9a7176",
+      "changed_files": [
+        "src/vs/sessions/contrib/automations/browser/automationDialog.ts",
+        "src/vs/workbench/contrib/chat/browser/widget/input/chatInputPart.ts"
+      ],
+      "issue_number": 334868,
+      "pr_number": 335087
+    },
+    {
+      "base_commit": "6999cd33789a83d02fa14fbb250343d4134e018d",
+      "changed_files": [
+        "src/vs/code/electron-main/app.ts",
+        "src/vs/code/electron-main/main.ts",
+        "src/vs/platform/update/electron-main/updateService.win32.ts",
+        "src/vs/platform/update/electron-main/win32UpdateType.ts"
+      ],
+      "issue_number": 335000,
+      "pr_number": 335206
+    },
+    {
+      "base_commit": "5d00bf6701105bc6a401b355098c1eb340763690",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/common/chatService/chatServiceImpl.ts"
+      ],
+      "issue_number": 335176,
+      "pr_number": 335177
+    },
+    {
+      "base_commit": "832cf23c5887351668f61c8648eb9c2ec6ee7d23",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/copilot/copilotAgentSession.ts",
+        "src/vs/platform/agentHost/node/copilot/copilotSessionWrapper.ts"
+      ],
+      "issue_number": 336240,
+      "pr_number": 336242
+    },
+    {
+      "base_commit": "464ae29680c9898c0cf9436168c2f63baddf7570",
+      "changed_files": [
+        "src/vs/sessions/contrib/chat/browser/sessionsChatAccessibilityHelp.ts",
+        "src/vs/sessions/contrib/onboardingTours/browser/tours/sessionArchiveTour.ts",
+        "src/vs/workbench/contrib/onboarding/browser/spotlight/spotlightPresentation.ts",
+        "src/vs/workbench/contrib/onboarding/browser/spotlight/spotlightTypes.ts"
+      ],
+      "issue_number": 336326,
+      "pr_number": 336403
+    },
+    {
+      "base_commit": "80a2663db974a32280e865c805d32eef9a7f86aa",
+      "changed_files": [
+        "src/vs/platform/mcp/common/allowedMcpServersService.ts",
+        "src/vs/platform/mcp/common/mcpGalleryService.ts",
+        "src/vs/platform/mcp/common/mcpManagement.ts",
+        "src/vs/platform/mcp/common/mcpManagementService.ts",
+        "src/vs/workbench/contrib/mcp/browser/mcpWorkbenchService.ts"
+      ],
+      "issue_number": 336624,
+      "pr_number": 335386
+    },
+    {
+      "base_commit": "05b2dc3eaac8a21046e759611546e43e6a70aef0",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationServiceImpl.ts",
+        "src/vs/workbench/contrib/chat/browser/aiCustomization/mcpServerCustomizationMigration.ts"
+      ],
+      "issue_number": 336854,
+      "pr_number": 336822
+    },
+    {
+      "base_commit": "40d50c179be22359a1717e04a7fc87f8535468ef",
+      "changed_files": [
+        "src/vs/sessions/contrib/chat/browser/media/chatInput.css"
+      ],
+      "issue_number": 337042,
+      "pr_number": 337109
+    },
+    {
+      "base_commit": "235f2ec057280022f2eb3a3ab5a92a04339748c0",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/widget/chatWidget.ts",
+        "src/vs/workbench/contrib/chat/browser/widget/input/chatInputPart.ts",
+        "src/vs/workbench/services/accounts/browser/defaultAccount.ts"
+      ],
+      "issue_number": 337078,
+      "pr_number": 338836
+    },
+    {
+      "base_commit": "b43364d185f3803edfb6bf3822a492ffc5da6cdb",
+      "changed_files": [
+        "src/vs/platform/git/common/localGitService.ts",
+        "src/vs/platform/git/node/localGitService.ts",
+        "src/vs/workbench/contrib/chat/browser/pluginGitCommandService.ts",
+        "src/vs/workbench/contrib/chat/browser/pluginGitHubAuthentication.ts",
+        "src/vs/workbench/contrib/chat/electron-browser/pluginGitCommandService.ts"
+      ],
+      "issue_number": 337199,
+      "pr_number": 337586
+    },
+    {
+      "base_commit": "3f638b5ac455689c45cf6a50569aab9032e1cb15",
+      "changed_files": [
+        "src/vs/platform/browserView/electron-browser/preload-browserView.ts"
+      ],
+      "issue_number": 337397,
+      "pr_number": 339336
+    },
+    {
+      "base_commit": "c0242e013c19481ca8320a3e83b0c31eb0a1712f",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/widget/chatContentParts/chatConfirmationWidget.ts"
+      ],
+      "issue_number": 337412,
+      "pr_number": 337414
+    },
+    {
+      "base_commit": "7ed8b26fdfae5b7d16e4004ad3e85cee40470ec1",
+      "changed_files": [
+        "src/vs/platform/workspaces/electron-main/workspacesHistoryMainService.ts"
+      ],
+      "issue_number": 337463,
+      "pr_number": 337591
+    },
+    {
+      "base_commit": "aef10952c557c01cc9df4d7e163c1337ee7b450e",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/remoteAgentHost/remoteAgentHostCustomizationHarness.ts"
+      ],
+      "issue_number": 337842,
+      "pr_number": 339379
+    },
+    {
+      "base_commit": "7657e4d872b4b998062bad91bf09ba76ed812e10",
+      "changed_files": [
+        "src/vs/code/electron-main/app.ts",
+        "src/vs/platform/browserView/common/browserView.ts",
+        "src/vs/platform/browserView/electron-main/browserViewMainService.ts",
+        "src/vs/workbench/contrib/browserView/common/browserView.ts",
+        "src/vs/workbench/contrib/browserView/electron-browser/browserViewWorkbenchService.ts"
+      ],
+      "issue_number": 338209,
+      "pr_number": 338703
+    },
+    {
+      "base_commit": "f39c7109bf651845855cbef5af2e91b2c9bd0a74",
+      "changed_files": [
+        "src/vs/platform/actionWidget/browser/actionList.ts",
+        "src/vs/platform/actionWidget/browser/tabbedActionListWidget.ts",
+        "src/vs/sessions/contrib/chat/browser/newChatInput.ts",
+        "src/vs/sessions/contrib/chat/browser/sessionWorkspacePicker.ts"
+      ],
+      "issue_number": 338374,
+      "pr_number": 338447
+    },
+    {
+      "base_commit": "f39c7109bf651845855cbef5af2e91b2c9bd0a74",
+      "changed_files": [
+        "src/vs/platform/actionWidget/browser/actionList.ts",
+        "src/vs/platform/actionWidget/browser/tabbedActionListWidget.ts",
+        "src/vs/sessions/contrib/chat/browser/newChatInput.ts",
+        "src/vs/sessions/contrib/chat/browser/sessionWorkspacePicker.ts"
+      ],
+      "issue_number": 338484,
+      "pr_number": 338447
+    },
+    {
+      "base_commit": "2fb8b9ee45db7c407d3d9635f713eeebae34f665",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/aiCustomization/customizationMarketplaceSkillInstaller.ts"
+      ],
+      "issue_number": 338582,
+      "pr_number": 339020
+    },
+    {
+      "base_commit": "7bd048c716b2a857cfcc75bbb2c76567d9f41688",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/aiCustomization/customizationMarketplaceInstallService.ts",
+        "src/vs/workbench/contrib/chat/browser/pluginInstallService.ts",
+        "src/vs/workbench/contrib/chat/common/plugins/agentPluginServiceImpl.ts",
+        "src/vs/workbench/contrib/chat/common/plugins/pluginInstallService.ts",
+        "src/vs/workbench/contrib/chat/common/plugins/pluginMarketplaceService.ts"
+      ],
+      "issue_number": 338584,
+      "pr_number": 338781
+    },
+    {
+      "base_commit": "62d758930fb1642067e32d745ab961a471b1d27a",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/copilot/copilotAgentSession.ts",
+        "src/vs/platform/agentHost/node/copilot/copilotNonPtyShellTerminals.ts"
+      ],
+      "issue_number": 339776,
+      "pr_number": 339970
+    },
+    {
+      "base_commit": "bb2b4cea1a7dfe6d04b7d401b91ef9a5c895d794",
+      "changed_files": [
+        "src/vs/platform/agentHost/common/agentService.ts"
+      ],
+      "issue_number": 339874,
+      "pr_number": 339903
+    }
+  ],
+  "meta": {
+    "created_at": "2026-10-10T23:18:29+00:00",
+    "dev_size": 100,
+    "excluded_from_test": [
+      148034,
+      237608,
+      281873,
+      301167,
+      318259,
+      319049,
+      322209,
+      323468,
+      323543,
+      323696,
+      323758,
+      323834,
+      324038,
+      324217,
+      324277,
+      324339,
+      325089,
+      325144,
+      325491,
+      325545,
+      325605,
+      325642,
+      325663,
+      326464,
+      326646,
+      326784,
+      327003,
+      327014,
+      327053,
+      327125,
+      327148,
+      327212,
+      327329,
+      327373,
+      327467,
+      327517,
+      327627,
+      327701,
+      327715,
+      327993,
+      328430,
+      328500,
+      328728,
+      328790,
+      328979,
+      329720,
+      329835,
+      329873,
+      329901,
+      329910,
+      329988,
+      330033,
+      330271,
+      330481,
+      330732,
+      331188,
+      332224,
+      332565,
+      333119,
+      333259,
+      333586,
+      333772,
+      334210,
+      334596,
+      334605,
+      334755,
+      334867,
+      334873,
+      335197,
+      335250,
+      335429,
+      335614,
+      335675,
+      335761,
+      335856,
+      336326,
+      336592,
+      336878
+    ],
+    "max_changed_files": 5,
+    "min_changed_files": 1,
+    "repo": "microsoft/vscode",
+    "seed": 20261010,
+    "source": "postgres corpus: every stored issue, v1 eligibility rules",
+    "test_sha256": "73c4101a7c6b0c3fa1e6a2090a3b0e38779e2ab6cc75924ce037f4c531c63e21",
+    "test_size": 100,
+    "total_eligible": 632,
+    "total_examined": 6000,
+    "version": 2
+  },
+  "rejected": {
+    "file_count_out_of_range": 122,
+    "file_list_truncated": 1,
+    "no_bug_label": 4706,
+    "not_exactly_one_merged_pr": 539
+  },
+  "test": [
+    {
+      "base_commit": "924b262fa86311efae0fd7e60ca29dc14ac48dcc",
+      "changed_files": [
+        "src/vs/workbench/browser/labels.ts",
+        "src/vs/workbench/contrib/scm/browser/media/scm.css",
+        "src/vs/workbench/services/decorations/browser/decorationsService.ts",
+        "src/vs/workbench/services/decorations/common/decorations.ts"
+      ],
+      "issue_number": 158212,
+      "pr_number": 335700
+    },
+    {
+      "base_commit": "165025bb78231e5a6d531f1bf68aad16e8d10b01",
+      "changed_files": [
+        "src/vs/editor/browser/viewParts/whitespace/whitespace.ts"
+      ],
+      "issue_number": 201123,
+      "pr_number": 336080
+    },
+    {
+      "base_commit": "3ac31b9b8e10c20c8f609d8c581403242eadeb3d",
+      "changed_files": [
+        "src/vs/platform/webview/common/webviewManagerService.ts",
+        "src/vs/platform/webview/electron-main/webviewMainService.ts",
+        "src/vs/workbench/contrib/webview/electron-browser/webviewElement.ts"
+      ],
+      "issue_number": 233044,
+      "pr_number": 337403
+    },
+    {
+      "base_commit": "45da12cf9ffca27888d7f669020288c1d684b30d",
+      "changed_files": [
+        "src/vs/code/electron-main/app.ts",
+        "src/vs/platform/terminal/common/localPtyChannel.ts"
+      ],
+      "issue_number": 234393,
+      "pr_number": 323980
+    },
+    {
+      "base_commit": "5ca078d771e95bde1167b9634d864cd88040b8d4",
+      "changed_files": [
+        "src/vs/workbench/contrib/terminal/browser/terminalInstance.ts"
+      ],
+      "issue_number": 277391,
+      "pr_number": 332981
+    },
+    {
+      "base_commit": "ab179c730eb371cfefe06e576f9ec710856da047",
+      "changed_files": [
+        "src/vs/editor/common/services/languageService.ts"
+      ],
+      "issue_number": 305051,
+      "pr_number": 338361
+    },
+    {
+      "base_commit": "010ee1aa74f8c8f0a12072f4766853ad71bc4014",
+      "changed_files": [
+        "build/win32/Cargo.toml",
+        "build/win32/inno_updater.exe"
+      ],
+      "issue_number": 307653,
+      "pr_number": 331941
+    },
+    {
+      "base_commit": "ca623b712829596bd90362ff896069d335ee938a",
+      "changed_files": [
+        "src/vs/workbench/contrib/multiDiffEditor/browser/multiDiffEditorInput.ts"
+      ],
+      "issue_number": 307899,
+      "pr_number": 338049
+    },
+    {
+      "base_commit": "bef11baa958d240792913cd147498dadbdfbe98f",
+      "changed_files": [
+        "src/vs/editor/contrib/semanticTokens/browser/documentSemanticTokens.ts"
+      ],
+      "issue_number": 311542,
+      "pr_number": 338358
+    },
+    {
+      "base_commit": "1c4f1296821a2349458e01d87910e7bf10ae1c88",
+      "changed_files": [
+        "src/vs/platform/mcp/common/mcpGalleryService.ts",
+        "src/vs/platform/mcp/common/mcpManagement.ts",
+        "src/vs/workbench/contrib/mcp/browser/mcpWorkbenchService.ts",
+        "src/vs/workbench/contrib/mcp/common/mcpTypes.ts"
+      ],
+      "issue_number": 317553,
+      "pr_number": 325380
+    },
+    {
+      "base_commit": "02750a72f1a6d6326bc2bf24a29585af0a210d7a",
+      "changed_files": [
+        "build/lib/stylelint/vscode-known-variables.json",
+        "extensions/theme-defaults/themes/2026-dark.json",
+        "extensions/theme-defaults/themes/2026-light.json",
+        "src/vs/editor/contrib/suggest/browser/media/suggest.css",
+        "src/vs/editor/contrib/suggest/browser/suggestWidget.ts"
+      ],
+      "issue_number": 320723,
+      "pr_number": 326005
+    },
+    {
+      "base_commit": "3cffe8622f5cb687267f6ff3984ad692865603f5",
+      "changed_files": [
+        "src/vs/platform/browserView/common/browserView.ts",
+        "src/vs/platform/browserView/electron-main/browserSession.ts",
+        "src/vs/platform/browserView/electron-main/browserViewMainService.ts",
+        "src/vs/workbench/contrib/browserView/electron-browser/browserViewWorkbenchService.ts"
+      ],
+      "issue_number": 320830,
+      "pr_number": 321043
+    },
+    {
+      "base_commit": "05b8b5b2b707dfabb59c5e9a977140330007e64b",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/copilot/copilotAgent.ts"
+      ],
+      "issue_number": 321816,
+      "pr_number": 323303
+    },
+    {
+      "base_commit": "6d5601efb9ccf5e4d3f91399e26a22963243de08",
+      "changed_files": [
+        "build/win32/code.iss",
+        "src/vs/platform/update/electron-main/updateRelaunchArguments.ts",
+        "src/vs/platform/update/electron-main/updateService.win32.ts"
+      ],
+      "issue_number": 322663,
+      "pr_number": 324275
+    },
+    {
+      "base_commit": "7207f731a477434811e61ca70e6c66ee4dc393fd",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/copilot/sessionCustomizationDiscovery.ts"
+      ],
+      "issue_number": 323036,
+      "pr_number": 324030
+    },
+    {
+      "base_commit": "398cd5b425a09d852f5cb58af2fb16a7ae71ccda",
+      "changed_files": [
+        "src/vs/sessions/contrib/providers/agentHost/browser/baseAgentHostSessionsProvider.ts"
+      ],
+      "issue_number": 323428,
+      "pr_number": 323548
+    },
+    {
+      "base_commit": "cdc1a322ff9b241f890443633ae3b03475f0a93c",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostSessionHandler.ts",
+        "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/stateToProgressAdapter.ts"
+      ],
+      "issue_number": 323634,
+      "pr_number": 323648
+    },
+    {
+      "base_commit": "04b756ba9f07d7232d9199c5d78f74a7e7eb164a",
+      "changed_files": [
+        "src/vs/sessions/services/sessions/browser/visibleSessions.ts"
+      ],
+      "issue_number": 323743,
+      "pr_number": 323744
+    },
+    {
+      "base_commit": "ff7190a001cfad1e83ccae05bc1ce9400837e9e0",
+      "changed_files": [
+        "src/vs/sessions/contrib/providers/agentHost/browser/baseAgentHostSessionsProvider.ts",
+        "src/vs/sessions/contrib/providers/agentHost/browser/localAgentHostSessionsProvider.ts",
+        "src/vs/sessions/contrib/providers/remoteAgentHost/browser/remoteAgentHostSessionsProvider.ts"
+      ],
+      "issue_number": 324329,
+      "pr_number": 324328
+    },
+    {
+      "base_commit": "bf3018c3eb9cceac464249439f6be7d3e56180f3",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/aiCustomization/toolsListWidget.ts"
+      ],
+      "issue_number": 324505,
+      "pr_number": 324643
+    },
+    {
+      "base_commit": "9b2dd750ed8c20b3eebe5a0f6293e55fa58b3a16",
+      "changed_files": [
+        "build/.cachesalt",
+        "src/vs/workbench/contrib/chat/browser/widget/chatListRenderer.ts",
+        "src/vs/workbench/contrib/chat/browser/widget/chatListWidget.ts",
+        "src/vs/workbench/contrib/chat/browser/widget/chatWidget.ts",
+        "src/vs/workbench/contrib/chat/common/model/chatViewModel.ts"
+      ],
+      "issue_number": 324766,
+      "pr_number": 324817
+    },
+    {
+      "base_commit": "f4a583b48a5dd54b56020d247944df45e43d5b09",
+      "changed_files": [
+        "src/vs/platform/actionWidget/browser/actionWidget.css"
+      ],
+      "issue_number": 325062,
+      "pr_number": 330509
+    },
+    {
+      "base_commit": "723afaaf1e465270ab6dc1b552c0c2120d38805d",
+      "changed_files": [
+        "src/vs/sessions/contrib/automations/browser/automationRunner.ts",
+        "src/vs/sessions/contrib/automations/browser/automationScheduler.ts",
+        "src/vs/workbench/contrib/chat/common/automations/automation.ts"
+      ],
+      "issue_number": 325088,
+      "pr_number": 325295
+    },
+    {
+      "base_commit": "d0d2ff7777fa25ec4ac37692bfb88db302e9552f",
+      "changed_files": [
+        "src/vs/workbench/browser/parts/editor/multiEditorTabsControl.ts",
+        "src/vs/workbench/contrib/styleOverrides/browser/media/tabs.css"
+      ],
+      "issue_number": 325136,
+      "pr_number": 325195
+    },
+    {
+      "base_commit": "ec2f3e608cc1f2f3dc2c4085f2090e60fc537008",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/widget/input/chatModelPicker.ts",
+        "src/vs/workbench/contrib/chat/browser/widget/input/chatModelSelectionLogic.ts"
+      ],
+      "issue_number": 325185,
+      "pr_number": 325444
+    },
+    {
+      "base_commit": "fa21667c6dc6f17f2aee96f58d880522a0ad1e32",
+      "changed_files": [
+        "src/vs/sessions/contrib/chat/browser/chatView.ts",
+        "src/vs/workbench/contrib/chat/browser/chat.ts",
+        "src/vs/workbench/contrib/chat/browser/widget/input/editor/chatInputEditorContrib.ts",
+        "src/vs/workbench/contrib/chat/browser/widgetHosts/editor/chatEditor.ts",
+        "src/vs/workbench/contrib/chat/browser/widgetHosts/viewPane/chatViewPane.ts"
+      ],
+      "issue_number": 325323,
+      "pr_number": 325404
+    },
+    {
+      "base_commit": "1f5097a1cfbe9e20c4c3867f1962f294b6649ca6",
+      "changed_files": [
+        "src/vs/sessions/contrib/changes/browser/changesView.ts"
+      ],
+      "issue_number": 325540,
+      "pr_number": 325541
+    },
+    {
+      "base_commit": "81337faf87a1bb11e3c99cb56bb6c8db75711713",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/agentHostSkillCompletionProvider.ts",
+        "src/vs/platform/agentHost/node/copilot/copilotSlashCommandCompletionProvider.ts"
+      ],
+      "issue_number": 325670,
+      "pr_number": 330178
+    },
+    {
+      "base_commit": "d4ea5d4a2c4b6dfc7d9006144ef3b6b2b30c2531",
+      "changed_files": [
+        "build/azure-pipelines/common/smokeTestAgentHost.ts",
+        "build/azure-pipelines/darwin/steps/product-build-darwin-compile.yml",
+        "build/azure-pipelines/linux/steps/product-build-linux-compile.yml",
+        "build/azure-pipelines/win32/steps/product-build-win32-compile.yml",
+        "remote/package.json"
+      ],
+      "issue_number": 326016,
+      "pr_number": 326019
+    },
+    {
+      "base_commit": "e478e2d774ebac46b581438dd25f4f7a23a7f104",
+      "changed_files": [
+        "src/vs/base/parts/ipc/common/ipc.mp.ts"
+      ],
+      "issue_number": 326171,
+      "pr_number": 326172
+    },
+    {
+      "base_commit": "2ce12fe6d8c461ef2ed074290c8cd15b736a6438",
+      "changed_files": [
+        "src/vs/code/electron-main/app.ts"
+      ],
+      "issue_number": 326368,
+      "pr_number": 326370
+    },
+    {
+      "base_commit": "d0d798b72155910a92f0f733abf9b1fcbdf37134",
+      "changed_files": [
+        "src/vs/workbench/contrib/modernUI/browser/media/fontRamp.css"
+      ],
+      "issue_number": 326495,
+      "pr_number": 335450
+    },
+    {
+      "base_commit": "4ee1d283595e1cf36a8fe14b5815a9542c871a76",
+      "changed_files": [
+        "src/vs/sessions/contrib/chat/browser/newChatInput.ts",
+        "src/vs/sessions/contrib/chat/browser/sessionsChatAccessibilityHelp.ts",
+        "src/vs/workbench/contrib/chat/browser/actions/chatSpeechToTextActions.ts"
+      ],
+      "issue_number": 326694,
+      "pr_number": 326697
+    },
+    {
+      "base_commit": "30185f6e4909f7453e0bfccf009841680015af08",
+      "changed_files": [
+        "src/vs/sessions/contrib/terminal/browser/sessionsTerminalContribution.ts",
+        "src/vs/sessions/services/sessions/browser/sessionsManagementService.ts",
+        "src/vs/sessions/services/sessions/common/sessionsManagement.ts"
+      ],
+      "issue_number": 327169,
+      "pr_number": 327225
+    },
+    {
+      "base_commit": "7a7ed3bc9e5d005db00838ccb8beec9e34bebf6b",
+      "changed_files": [
+        "src/vs/workbench/contrib/terminal/browser/chatTerminalCommandMirror.ts"
+      ],
+      "issue_number": 327440,
+      "pr_number": 327441
+    },
+    {
+      "base_commit": "74dc74c00942cd18cc82eb72e6f08de8a7cf1cf1",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostSessionHandler.ts",
+        "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/stateToProgressAdapter.ts"
+      ],
+      "issue_number": 327556,
+      "pr_number": 327555
+    },
+    {
+      "base_commit": "4f277fcec9cbdf4916ee210f167bb71e7db3e840",
+      "changed_files": [
+        "src/vs/platform/agentHost/browser/remoteAgentHostProtocolClient.ts",
+        "src/vs/platform/agentHost/node/agentService.ts",
+        "src/vs/platform/agentHost/node/protocolServerHandler.ts",
+        "src/vs/sessions/contrib/providers/agentHost/browser/baseAgentHostSessionsProvider.ts"
+      ],
+      "issue_number": 327630,
+      "pr_number": 327629
+    },
+    {
+      "base_commit": "453caa8cbcbb552c19528e8c4b4b33dc3507d0e2",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/promptTimeline/promptTimelineWidgetContrib.ts",
+        "src/vs/workbench/contrib/chat/browser/widget/chatWidget.ts"
+      ],
+      "issue_number": 327645,
+      "pr_number": 330339
+    },
+    {
+      "base_commit": "50b1915ca1a37c9c8165650675013b7f54b6c035",
+      "changed_files": [
+        "src/vs/sessions/contrib/chat/browser/responseSelectionResolver.ts",
+        "src/vs/sessions/contrib/chat/browser/responseSelectionSideChatController.ts"
+      ],
+      "issue_number": 327707,
+      "pr_number": 327931
+    },
+    {
+      "base_commit": "b5c7a932475b86da2ed71151ff2e387887b63a34",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/widget/chatListRenderer.ts",
+        "src/vs/workbench/contrib/chat/browser/widget/chatWidget.ts",
+        "src/vs/workbench/contrib/chat/browser/widget/media/chat.css"
+      ],
+      "issue_number": 327712,
+      "pr_number": 327972
+    },
+    {
+      "base_commit": "e51dbbec09906d02385432def41dde788343515c",
+      "changed_files": [
+        "src/vs/sessions/contrib/providers/remoteAgentHost/browser/remoteAgentHost.contribution.ts",
+        "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentCustomizationItemProvider.ts",
+        "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostActiveClientService.ts",
+        "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostLocalCustomizations.ts"
+      ],
+      "issue_number": 327754,
+      "pr_number": 327946
+    },
+    {
+      "base_commit": "e51d1cb61db07622540d13c49ed3adf5e0b0f769",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/widget/chatListRenderer.ts"
+      ],
+      "issue_number": 328638,
+      "pr_number": 328639
+    },
+    {
+      "base_commit": "cee4edd90080d792b83fd42e31c93eb13603e64e",
+      "changed_files": [
+        "src/vs/platform/browserView/electron-browser/preload-browserView.ts",
+        "src/vs/workbench/contrib/browserView/electron-browser/features/browserEditorChatFeatures.ts"
+      ],
+      "issue_number": 328795,
+      "pr_number": 329072
+    },
+    {
+      "base_commit": "5a467963eb9645fb35ed660c18569921d2d4554f",
+      "changed_files": [
+        "src/vs/workbench/contrib/agentsVoice/browser/voiceModeOnboarding.ts"
+      ],
+      "issue_number": 328796,
+      "pr_number": 328833
+    },
+    {
+      "base_commit": "cfae0daa7f825a8aecd8aa8a501ecce9070451ed",
+      "changed_files": [
+        "src/vs/workbench/contrib/agentsVoice/browser/voiceModeOnboarding.ts",
+        "src/vs/workbench/contrib/chat/browser/speechToText/dictationOnboarding.ts"
+      ],
+      "issue_number": 328849,
+      "pr_number": 328851
+    },
+    {
+      "base_commit": "88e4e20836a58f7615268f431ce481c1ee4520cb",
+      "changed_files": [
+        "src/vs/sessions/contrib/accountMenu/browser/media/accountTitleBarWidget.css"
+      ],
+      "issue_number": 329232,
+      "pr_number": 329396
+    },
+    {
+      "base_commit": "ce895254282ffbe0e439fd9edcd1e1b354529b73",
+      "changed_files": [
+        "src/vs/platform/agentHost/browser/remoteAgentHostProtocolClient.ts",
+        "src/vs/platform/agentHost/common/state/agentSubscription.ts",
+        "src/vs/platform/agentHost/electron-main/electronAgentHostStarter.ts",
+        "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostChatContribution.ts"
+      ],
+      "issue_number": 329421,
+      "pr_number": 330013
+    },
+    {
+      "base_commit": "75d99b97a6bca18c3e48297b37e8ccd9ab77cf16",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/voiceClient/voiceSessionController.ts"
+      ],
+      "issue_number": 329443,
+      "pr_number": 329451
+    },
+    {
+      "base_commit": "a591831cb40055778dc63490c16b2b5c9a3dc461",
+      "changed_files": [
+        ".npmrc",
+        "cgmanifest.json",
+        "package.json"
+      ],
+      "issue_number": 329654,
+      "pr_number": 332863
+    },
+    {
+      "base_commit": "e7d7d85d81d076c419407085c4ec9dc1ac347dba",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostLocalCustomizations.ts",
+        "src/vs/workbench/contrib/chat/browser/aiCustomization/aiCustomizationItemSource.ts",
+        "src/vs/workbench/contrib/chat/browser/aiCustomization/aiCustomizationItemsModel.ts",
+        "src/vs/workbench/contrib/chat/common/promptSyntax/service/promptsService.ts"
+      ],
+      "issue_number": 329751,
+      "pr_number": 329786
+    },
+    {
+      "base_commit": "5bd52b9cb66b88e52e25bbb1e27c6a53f46f24a0",
+      "changed_files": [
+        "src/vs/sessions/common/contextkeys.ts",
+        "src/vs/sessions/contrib/changes/browser/changesViewActions.ts"
+      ],
+      "issue_number": 329779,
+      "pr_number": 329780
+    },
+    {
+      "base_commit": "42b1420914c8b46f690e8b5f385722320d7b2d8f",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/agentService.ts",
+        "src/vs/platform/agentHost/node/shared/worktreeIsolation.ts"
+      ],
+      "issue_number": 329880,
+      "pr_number": 329986
+    },
+    {
+      "base_commit": "1a664bf652320a626ee2c4a8419977a9f88e8b91",
+      "changed_files": [
+        "src/vs/platform/localTranscription/node/foundryLocalModelImport.ts"
+      ],
+      "issue_number": 329904,
+      "pr_number": 329972
+    },
+    {
+      "base_commit": "e4cf45e5db36fc294793156b6b90984896efabb6",
+      "changed_files": [
+        "extensions/copilot/src/platform/networking/node/stream.ts"
+      ],
+      "issue_number": 329963,
+      "pr_number": 330038
+    },
+    {
+      "base_commit": "cee16d71ff9cb5847257c42573c429da299e89b7",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/shared/agentServerToolHost.ts",
+        "src/vs/platform/agentHost/node/shared/sessionServerTools.ts"
+      ],
+      "issue_number": 330138,
+      "pr_number": 332926
+    },
+    {
+      "base_commit": "ec07db383765ac7e9784e1eb32bf4a7350e33a26",
+      "changed_files": [
+        "src/vs/platform/browserView/node/playwrightService.ts"
+      ],
+      "issue_number": 330381,
+      "pr_number": 330382
+    },
+    {
+      "base_commit": "a435954732f216ba59c4ae47f82e78ad1a5e35b0",
+      "changed_files": [
+        "src/vs/workbench/services/editor/browser/editorService.ts"
+      ],
+      "issue_number": 330459,
+      "pr_number": 330462
+    },
+    {
+      "base_commit": "2765d28c21c62c8f98ce97eab71cd273535a8bbb",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/agentPluginCommands.ts",
+        "src/vs/workbench/contrib/chat/browser/agentPluginsView.ts",
+        "src/vs/workbench/contrib/chat/browser/chat.shared.contribution.ts"
+      ],
+      "issue_number": 330497,
+      "pr_number": 330499
+    },
+    {
+      "base_commit": "40729c9659110af186eced69fd9eb2269148c9dd",
+      "changed_files": [
+        "src/vs/sessions/contrib/chat/browser/chatView.ts",
+        "src/vs/workbench/contrib/chat/browser/chat.ts",
+        "src/vs/workbench/contrib/chat/browser/widget/chatWidget.ts"
+      ],
+      "issue_number": 330555,
+      "pr_number": 330664
+    },
+    {
+      "base_commit": "3d952f83c241b58ecbb72999ad2c491c93254846",
+      "changed_files": [
+        "extensions/copilot/src/platform/endpoint/node/responsesApi.ts"
+      ],
+      "issue_number": 330610,
+      "pr_number": 330662
+    },
+    {
+      "base_commit": "d6f8eda80d2fde9f891ff234a06bcdb8809b4742",
+      "changed_files": [
+        "src/vs/workbench/services/dialogs/browser/simpleFileDialog.ts"
+      ],
+      "issue_number": 330626,
+      "pr_number": 330629
+    },
+    {
+      "base_commit": "d306b4b1085211adf4d8c26e7ec5bdcb488e759d",
+      "changed_files": [
+        "src/vs/workbench/contrib/mcp/common/mcpService.ts"
+      ],
+      "issue_number": 330637,
+      "pr_number": 330638
+    },
+    {
+      "base_commit": "624addcc72ad6c3eae4d2c1409bde8da9b33e515",
+      "changed_files": [
+        "src/vs/sessions/contrib/chat/browser/newChatInput.ts",
+        "src/vs/workbench/contrib/chat/browser/speechToText/dictationActionViewItem.ts",
+        "src/vs/workbench/contrib/chat/browser/speechToText/dictationSession.ts",
+        "src/vs/workbench/contrib/chat/browser/voiceInputMode/voiceInputModeActionViewItem.ts",
+        "src/vs/workbench/contrib/chat/browser/widget/input/chatInputPart.ts"
+      ],
+      "issue_number": 331206,
+      "pr_number": 331221
+    },
+    {
+      "base_commit": "b062efe16966c7129ab1938e374277c73d966c6e",
+      "changed_files": [
+        "src/vs/base/browser/ui/toolbar/toolbar.ts",
+        "src/vs/workbench/contrib/chat/browser/widget/input/chatInputPart.ts"
+      ],
+      "issue_number": 331228,
+      "pr_number": 339847
+    },
+    {
+      "base_commit": "45b7c7d73c38022364d01a3688478986abda4062",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/actions/chatContextActions.ts",
+        "src/vs/workbench/contrib/chat/browser/chat.ts",
+        "src/vs/workbench/contrib/chat/browser/chatInputWindow/chatInputWindowService.ts",
+        "src/vs/workbench/contrib/chat/browser/widget/chatWidget.ts"
+      ],
+      "issue_number": 331252,
+      "pr_number": 331353
+    },
+    {
+      "base_commit": "de6c4a73b80c9c5e4d9e61bd0a47df45f31a8204",
+      "changed_files": [
+        "src/vs/sessions/contrib/aquarium/browser/media/aquarium.css"
+      ],
+      "issue_number": 331357,
+      "pr_number": 331380
+    },
+    {
+      "base_commit": "c2b336daae7101676f179b30f92641cdfcc6b38c",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/actions/chatClear.ts",
+        "src/vs/workbench/contrib/chat/browser/widgetHosts/editor/chatEditorInput.ts",
+        "src/vs/workbench/contrib/chat/common/constants.ts",
+        "src/vs/workbench/contrib/chat/common/model/chatUri.ts"
+      ],
+      "issue_number": 331422,
+      "pr_number": 331424
+    },
+    {
+      "base_commit": "0d07085cd00247fd08528b00bda676ce4c8767ee",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/agentService.ts"
+      ],
+      "issue_number": 331452,
+      "pr_number": 331510
+    },
+    {
+      "base_commit": "a04614ef5e4e9531703d67722046490d4ea0cce2",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/copilot/copilotAgentSession.ts"
+      ],
+      "issue_number": 331477,
+      "pr_number": 338052
+    },
+    {
+      "base_commit": "d584e015c079a68a97086bfcbf820329fa7c940c",
+      "changed_files": [
+        "src/vs/workbench/browser/actions/layoutActions.ts",
+        "src/vs/workbench/common/contextkeys.ts",
+        "src/vs/workbench/contrib/update/browser/update.ts",
+        "src/vs/workbench/contrib/update/common/update.ts"
+      ],
+      "issue_number": 331562,
+      "pr_number": 331586
+    },
+    {
+      "base_commit": "70373c22bdd42785c1bfa7dbc45acebcf2bc0e33",
+      "changed_files": [
+        "src/vs/sessions/electron-browser/actions/vscodeActions.ts"
+      ],
+      "issue_number": 331592,
+      "pr_number": 331711
+    },
+    {
+      "base_commit": "588c0743e8d41bc6447ed7668a5507fdce9c29bd",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/common/promptSyntax/service/promptsServiceImpl.ts"
+      ],
+      "issue_number": 331853,
+      "pr_number": 331855
+    },
+    {
+      "base_commit": "7cc261eb4fa9c07eb77505f4ecfb33992226713e",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/copilot/copilotAgent.ts",
+        "src/vs/sessions/contrib/providers/remoteAgentHost/browser/remoteAgentHost.contribution.ts",
+        "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostAuth.ts",
+        "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostChatContribution.ts"
+      ],
+      "issue_number": 332020,
+      "pr_number": 333902
+    },
+    {
+      "base_commit": "7d0a3d70d45729daee06b73b25808a39ca9826e4",
+      "changed_files": [
+        "src/vs/sessions/contrib/github/browser/pullRequestPicker.ts"
+      ],
+      "issue_number": 332505,
+      "pr_number": 333158
+    },
+    {
+      "base_commit": "6ee8ed095392a80fc15f977c63be7d22251f5f45",
+      "changed_files": [
+        "src/vs/sessions/contrib/sessions/browser/media/sessionsList.css"
+      ],
+      "issue_number": 332997,
+      "pr_number": 334191
+    },
+    {
+      "base_commit": "87b6ce272be6d71d472bde53cbdbb490e1a8a2b2",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/actions/chatFindActions.ts",
+        "src/vs/workbench/contrib/chat/browser/widget/chatFind/chatFindWidget.ts",
+        "src/vs/workbench/contrib/chat/browser/widget/chatListWidget.ts"
+      ],
+      "issue_number": 333118,
+      "pr_number": 333135
+    },
+    {
+      "base_commit": "eb9db9d62704f6eb616891da6f0f856c467a983c",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/chatManagement/chatModelsViewModel.ts",
+        "src/vs/workbench/contrib/chat/common/languageModels.ts"
+      ],
+      "issue_number": 333188,
+      "pr_number": 333214
+    },
+    {
+      "base_commit": "1dbbce1da524efa885a751381426f1591a9f41c1",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/chatWindowNotifier.ts",
+        "src/vs/workbench/contrib/chat/common/chatService/chatServiceImpl.ts"
+      ],
+      "issue_number": 333250,
+      "pr_number": 333582
+    },
+    {
+      "base_commit": "79f132ec3a12aba7194c475feadf39acf7228c15",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/shared/sessionServerTools.ts"
+      ],
+      "issue_number": 333794,
+      "pr_number": 333991
+    },
+    {
+      "base_commit": "2145e84f0a5c16d922ebd7d5b2431ef4f67d0409",
+      "changed_files": [
+        "src/vs/sessions/contrib/sessions/browser/views/sessionsList.ts"
+      ],
+      "issue_number": 333967,
+      "pr_number": 333998
+    },
+    {
+      "base_commit": "5917dcccf42bbd76fa6423840608de8a41bf186a",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/widget/chatListRenderer.ts"
+      ],
+      "issue_number": 334119,
+      "pr_number": 334123
+    },
+    {
+      "base_commit": "d9c91244e7e87e6a4a9d36902a704bbdc0e33aed",
+      "changed_files": [
+        "src/vs/code/electron-main/app.ts",
+        "src/vs/platform/protocol/electron-main/managedRemoteResourceProtocol.ts",
+        "src/vs/platform/protocol/electron-main/protocol.ts",
+        "src/vs/platform/protocol/electron-main/protocolMainService.ts"
+      ],
+      "issue_number": 334144,
+      "pr_number": 335241
+    },
+    {
+      "base_commit": "0fd2d7cc97a54f7b7e9839650198b8e7684534e6",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/copilot/copilotAgent.ts",
+        "src/vs/platform/agentHost/node/copilot/copilotAgentSession.ts"
+      ],
+      "issue_number": 334159,
+      "pr_number": 334338
+    },
+    {
+      "base_commit": "8bc9f99ded9e4ed194ed29f1b1577535f6ca1f99",
+      "changed_files": [
+        "extensions/copilot/src/extension/conversation/common/languageModelAccess.ts",
+        "src/vs/platform/agentHost/common/autoModeTiers.ts"
+      ],
+      "issue_number": 334543,
+      "pr_number": 337275
+    },
+    {
+      "base_commit": "e1fd487fa7b009731a860498285445ff30264e57",
+      "changed_files": [
+        "src/vs/sessions/contrib/search/browser/media/searchEditorEmptyState.css",
+        "src/vs/sessions/contrib/search/browser/search.contribution.ts",
+        "src/vs/sessions/contrib/search/browser/searchEditorEmptyState.contribution.ts"
+      ],
+      "issue_number": 334630,
+      "pr_number": 334966
+    },
+    {
+      "base_commit": "eb10336690ba9c8043eb13064896f9acf318802c",
+      "changed_files": [
+        "src/vs/platform/agentHost/common/agentMerge.ts",
+        "src/vs/platform/agentHost/common/meta/agentSystemNotificationMeta.ts",
+        "src/vs/platform/agentHost/node/agentMergeController.ts"
+      ],
+      "issue_number": 335168,
+      "pr_number": 335258
+    },
+    {
+      "base_commit": "7ca7edcbdb44ee860f7f4810c04b2cb2930364df",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/copilot/copilotGitHubTelemetryForwarder.ts"
+      ],
+      "issue_number": 335623,
+      "pr_number": 339601
+    },
+    {
+      "base_commit": "301c31b679b3313439f01cdf9cd1d6c63d70d34b",
+      "changed_files": [
+        "src/vs/sessions/contrib/chat/browser/media/chatView.css"
+      ],
+      "issue_number": 335688,
+      "pr_number": 335911
+    },
+    {
+      "base_commit": "fff7f7181b5df2866b8d1ebc52a7eb65b4a34572",
+      "changed_files": [
+        "src/vs/sessions/contrib/chat/browser/media/chatInput.css",
+        "src/vs/sessions/contrib/chat/browser/newChatInSessionWidget.ts",
+        "src/vs/sessions/contrib/chat/browser/newChatInput.ts"
+      ],
+      "issue_number": 335752,
+      "pr_number": 335750
+    },
+    {
+      "base_commit": "c48e5e4a36448a6788d234ac510cf0985a08e10b",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/aiCustomization/aiCustomizationManagementEditor.ts",
+        "src/vs/workbench/contrib/chat/browser/aiCustomization/embeddedAgentPluginDetail.ts",
+        "src/vs/workbench/contrib/chat/browser/aiCustomization/media/aiCustomizationManagement.css"
+      ],
+      "issue_number": 335857,
+      "pr_number": 335850
+    },
+    {
+      "base_commit": "78283637f7d4f67e52783ebc38dbff941d651110",
+      "changed_files": [
+        "package.json"
+      ],
+      "issue_number": 336369,
+      "pr_number": 336747
+    },
+    {
+      "base_commit": "3452ab28fab54344694122ec9bc79b7c23d91cc7",
+      "changed_files": [
+        "src/vs/platform/agentHost/node/codex/codexAgent.ts"
+      ],
+      "issue_number": 336394,
+      "pr_number": 337724
+    },
+    {
+      "base_commit": "597d6c38f75065e71b49006710d80e8c1def87db",
+      "changed_files": [
+        "src/vs/workbench/contrib/chat/browser/widget/chatContentParts/media/chatThinkingContent.css"
+      ],
+      "issue_number": 337076,
+      "pr_number": 337184
+    },
+    {
+      "base_commit": "472fec888a971ed2d5e31e9a53c3830f6ae8d923",
+      "changed_files": [
+        "build/azure-pipelines/linux/steps/product-build-linux-test.yml"
+      ],
+      "issue_number": 337227,
+      "pr_number": 337218
+    },
+    {
+      "base_commit": "d2dacb76b2f5c1cafcf24dc3c1906e6f4f47918e",
+      "changed_files": [
+        "src/vs/code/electron-main/app.ts"
+      ],
+      "issue_number": 337679,
+      "pr_number": 337682
+    },
+    {
+      "base_commit": "428d966fd0760a817fa81efa6a3ff2f812c2297e",
+      "changed_files": [
+        "src/vs/sessions/common/agentHostSessionsProvider.ts",
+        "src/vs/sessions/contrib/providers/agentHost/browser/baseAgentHostSessionsProvider.ts",
+        "src/vs/sessions/contrib/providers/agentHost/browser/devContainerAgentHostSessionsProvider.ts"
+      ],
+      "issue_number": 338533,
+      "pr_number": 338634
+    },
+    {
+      "base_commit": "32f76dd08a9b2d4ae2edc06dace71e8a77b78171",
+      "changed_files": [
+        "src/vs/sessions/contrib/providers/copilotChatSessions/browser/copilotChatSessionsProvider.ts"
+      ],
+      "issue_number": 338542,
+      "pr_number": 338690
+    },
+    {
+      "base_commit": "8636777c37989676621419af5d1031f5d6e38046",
+      "changed_files": [
+        "src/vs/platform/agentHost/common/agentService.ts",
+        "src/vs/platform/agentHost/node/agentHostTerminalManager.ts",
+        "src/vs/platform/agentHost/node/agentService.ts",
+        "src/vs/platform/agentHost/node/protocolServerHandler.ts"
+      ],
+      "issue_number": 338608,
+      "pr_number": 338612
+    },
+    {
+      "base_commit": "6eb5f37d1c05683262724dba334221290d8f4188",
+      "changed_files": [
+        "src/vs/workbench/contrib/debug/browser/debugSession.ts"
+      ],
+      "issue_number": 339076,
+      "pr_number": 339530
+    },
+    {
+      "base_commit": "3355e668c289d49317b5dc65141263671d2295f0",
+      "changed_files": [
+        "src/vs/workbench/browser/chatDropdownPill.ts"
+      ],
+      "issue_number": 339637,
+      "pr_number": 339636
+    }
+  ]
+}

@@ -4,6 +4,7 @@ import json
 import os
 import sys
 from dataclasses import asdict
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Protocol
 from urllib.parse import urlsplit, urlunsplit
@@ -17,6 +18,12 @@ from miresolver.agents.graph import build_graph, resolve
 from miresolver.agents.types import NewIssue, Resolution, ResolverOptions
 from miresolver.code.reader import CodeReadError
 
+from miresolver.benchmark import (
+    BenchmarkError,
+    benchmark_to_json,
+    build_benchmark,
+    load_corpus,
+)
 from miresolver.config import Config, ConfigError, load_config, read_dotenv
 from miresolver.evaluation.corpus import load_issue_text
 from miresolver.evaluation.runner import (
@@ -277,6 +284,58 @@ def _database_url(env: dict[str, str], command: str) -> str:
     return url
 
 
+def _load_corpus(database_url: str):
+    with psycopg.connect(database_url, autocommit=True) as conn:
+        return load_corpus(conn)
+
+
+def _issue_numbers_in_run(run_dir: Path) -> set[int]:
+    path = run_dir / "cases.jsonl"
+    try:
+        lines = path.read_text().splitlines()
+    except OSError as exc:
+        raise BenchmarkError(f"cannot read {path}: {exc}") from exc
+    return {int(json.loads(line)["issue_number"]) for line in lines if line.strip()}
+
+
+def _run_benchmark(args: argparse.Namespace) -> int:
+    if args.out.exists():
+        print(
+            f"benchmark failed: {args.out} exists. A published benchmark is "
+            f"frozen; write a new version to a new file instead.",
+            file=sys.stderr,
+        )
+        return 1
+    env = _env()
+    url = _database_url(env, "benchmark")
+    excluded: set[int] = set()
+    for run_dir in args.exclude_run:
+        excluded |= _issue_numbers_in_run(run_dir)
+    issues, prs = _load_corpus(url)
+    bench = build_benchmark(
+        issues, prs,
+        repo=env.get("TARGET_REPO", "microsoft/vscode"),
+        seed=args.seed,
+        test_size=args.test_size,
+        dev_size=args.dev_size,
+        created_at=datetime.now(UTC).isoformat(timespec="seconds"),
+        exclude_from_test=excluded,
+        source="postgres corpus: every stored issue, v1 eligibility rules",
+    )
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    args.out.write_text(benchmark_to_json(bench))
+    meta = bench.meta
+    print(f"examined issues: {meta['total_examined']}")
+    print(f"eligible cases: {meta['total_eligible']}")
+    for reason, count in sorted(bench.rejected.items()):
+        print(f"  rejected {reason}: {count}")
+    print(f"test: {len(bench.test)} (seed {meta['seed']}, created {meta['created_at']})")
+    print(f"dev: {len(bench.dev)}")
+    print(f"excluded from test as already used: {len(meta['excluded_from_test'])}")
+    print(f"test_sha256: {meta['test_sha256']}")
+    return 0
+
+
 def _options(args: argparse.Namespace) -> ResolverOptions:
     return ResolverOptions(
         retrieve_k=args.retrieve_k,
@@ -372,7 +431,7 @@ def _run_evaluate(args: argparse.Namespace) -> int:
         raise EvaluationError(f"cannot read manifest {args.manifest}: {exc}") from exc
     cases = select_cases(
         manifest, which=args.set, limit=args.limit, seed=args.seed,
-        allow_full=args.allow_full,
+        allow_full=args.allow_full, allow_test=args.final,
     )
     options = _options(args)
     if args.estimate:
@@ -486,6 +545,19 @@ def main(argv: list[str] | None = None) -> int:
     )
     search_cmd.add_argument("--limit", type=int, default=10)
 
+    bench_cmd = sub.add_parser(
+        "benchmark",
+        help="build a versioned dev/test manifest from the stored corpus",
+    )
+    bench_cmd.add_argument("--out", type=Path, default=Path("eval/manifest.v2.json"))
+    bench_cmd.add_argument("--seed", type=int, default=20261010)
+    bench_cmd.add_argument("--test-size", type=int, default=100)
+    bench_cmd.add_argument("--dev-size", type=int, default=100)
+    bench_cmd.add_argument(
+        "--exclude-run", type=Path, action="append", default=[],
+        help="results directory of an earlier run; its cases never enter the test set",
+    )
+
     resolve_cmd = sub.add_parser(
         "resolve", help="suggest files and an approach for one bug report"
     )
@@ -506,10 +578,14 @@ def main(argv: list[str] | None = None) -> int:
     eval_cmd = sub.add_parser(
         "evaluate", help="score the resolver against the manifest answer key"
     )
-    eval_cmd.add_argument("--set", choices=("dev", "full"), default="dev")
+    eval_cmd.add_argument("--set", choices=("dev", "test", "full"), default="dev")
     eval_cmd.add_argument("--limit", type=int, default=None)
     eval_cmd.add_argument("--seed", type=int, default=20260921)
     eval_cmd.add_argument("--allow-full", action="store_true")
+    eval_cmd.add_argument(
+        "--final", action="store_true",
+        help="required for --set test: the one held-out run per mode",
+    )
     eval_cmd.add_argument("--max-cost", type=float, default=DEFAULT_MAX_COST)
     eval_cmd.add_argument("--estimate", action="store_true")
     eval_cmd.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST_PATH)
@@ -540,6 +616,20 @@ def main(argv: list[str] | None = None) -> int:
         except psycopg.OperationalError as exc:
             print(
                 f"{args.command} failed: cannot connect to Postgres: {exc}. "
+                f"Is it running? Try `docker compose up -d postgres`.",
+                file=sys.stderr,
+            )
+            return 1
+
+    if args.command == "benchmark":
+        try:
+            return _run_benchmark(args)
+        except (ConfigError, BenchmarkError) as exc:
+            print(f"benchmark failed: {exc}", file=sys.stderr)
+            return 1
+        except psycopg.OperationalError as exc:
+            print(
+                f"benchmark failed: cannot connect to Postgres: {exc}. "
                 f"Is it running? Try `docker compose up -d postgres`.",
                 file=sys.stderr,
             )
