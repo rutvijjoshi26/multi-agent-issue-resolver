@@ -140,16 +140,30 @@ def _redact_url(url: str) -> str:
         return url
 
 
+async def _then_close(embedder, work):
+    """Await work, then close the embedder on the same event loop.
+
+    The embedder's HTTP client pools connections bound to the loop that
+    opened them, so closing it from a second asyncio.run fails with
+    "Event loop is closed" even after the work succeeded.
+    """
+    try:
+        return await work
+    finally:
+        await embedder.aclose()
+
+
 def _run_index(args: argparse.Namespace) -> int:
     settings = _load_models(args.models)
-    env = {**read_dotenv(), **os.environ}
+    env = _env()
     config = load_config(env)
     collection = _resolve_collection(args, settings)
 
     # Built only after every step that can fail on its own (bad model
     # config, missing DATABASE_URL) has already succeeded, so a failure
     # never leaves an embedder client open with nothing to close it.
-    embedder = build_embedder(settings, os.environ)
+    embedder = build_embedder(settings, env)
+    embedder_closed = False
     client: QdrantClient | None = None
     try:
         # Postgres is attempted before QdrantClient is constructed: aside
@@ -173,8 +187,13 @@ def _run_index(args: argparse.Namespace) -> int:
         client = QdrantClient(url=args.qdrant_url)
         index = IssueIndex(client, collection=collection)
         try:
+            # _then_close closes the embedder inside the loop, success or not.
+            embedder_closed = True
             indexed = asyncio.run(
-                build_index(documents, embedder, index, batch_size=args.batch_size)
+                _then_close(
+                    embedder,
+                    build_index(documents, embedder, index, batch_size=args.batch_size),
+                )
             )
         except ApiException as exc:
             print(
@@ -185,7 +204,8 @@ def _run_index(args: argparse.Namespace) -> int:
             )
             return 1
     finally:
-        asyncio.run(embedder.aclose())
+        if not embedder_closed:
+            asyncio.run(embedder.aclose())
         if client is not None:
             client.close()
     print(f"indexed {indexed} issues into {collection}")
@@ -196,13 +216,17 @@ def _run_search(args: argparse.Namespace) -> int:
     settings = _load_models(args.models)
     collection = _resolve_collection(args, settings)
 
-    embedder = build_embedder(settings, os.environ)
+    embedder = build_embedder(settings, _env())
+    embedder_closed = False
     client: QdrantClient | None = None
     try:
         client = QdrantClient(url=args.qdrant_url)
         index = IssueIndex(client, collection=collection)
         try:
-            hits = asyncio.run(search(args.query, embedder, index, limit=args.limit))
+            embedder_closed = True  # _then_close closes it inside the loop
+            hits = asyncio.run(
+                _then_close(embedder, search(args.query, embedder, index, limit=args.limit))
+            )
         except ApiException as exc:
             print(
                 f"search failed: cannot reach Qdrant at "
@@ -212,7 +236,8 @@ def _run_search(args: argparse.Namespace) -> int:
             )
             return 1
     finally:
-        asyncio.run(embedder.aclose())
+        if not embedder_closed:
+            asyncio.run(embedder.aclose())
         if client is not None:
             client.close()
 
