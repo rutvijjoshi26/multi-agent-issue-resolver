@@ -282,3 +282,16 @@ def test_a_run_tag_is_appended_to_the_directory_name(tmp_path):
         timestamp="20261010T000000Z",
     ))
     assert out.name == "dev-n1-seed3-20261010T000000Z-always-answer"
+
+
+def test_case_lines_record_each_candidates_changed_files(tmp_path):
+    cases = select_cases(MANIFEST, which="dev", limit=1, seed=1)
+
+    async def resolver(issue, exclude):
+        return resolution([], cands=[Candidate(7, "", "", 70, ("src/a.ts",), 0)])
+
+    out = run(cases, resolver, tmp_path)
+    line = json.loads((out / "cases.jsonl").read_text().splitlines()[0])
+    assert line["candidates"] == [
+        {"issue_number": 7, "pr_number": 70, "changed_files": ["src/a.ts"]}
+    ]

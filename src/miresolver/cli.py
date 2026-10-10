@@ -25,6 +25,12 @@ from miresolver.benchmark import (
     load_corpus,
 )
 from miresolver.config import Config, ConfigError, load_config, read_dotenv
+from miresolver.evaluation.calibration import (
+    CalibrationError,
+    choose_thresholds,
+    evaluate_thresholds,
+    load_run,
+)
 from miresolver.evaluation.corpus import load_issue_text
 from miresolver.evaluation.runner import (
     EvaluationError,
@@ -337,6 +343,31 @@ def _run_benchmark(args: argparse.Namespace) -> int:
     return 0
 
 
+def _run_calibrate(args: argparse.Namespace) -> int:
+    try:
+        summary, signals = load_run(args.run)
+    except (OSError, ValueError, KeyError) as exc:
+        raise CalibrationError(f"cannot read run {args.run}: {exc}") from exc
+    run = summary.get("run", {})
+    if run.get("set") != "dev":
+        raise CalibrationError(
+            f"refusing to calibrate on a {run.get('set')!r} run; thresholds are "
+            f"chosen on the dev set only"
+        )
+    if run.get("mode") != "always-answer":
+        raise CalibrationError(
+            "calibration needs an always-answer run, where every case was "
+            "synthesized and its confidences recorded"
+        )
+    chosen = choose_thresholds(signals)
+    default = evaluate_thresholds(signals, 0.5, 0.5)
+    print(json.dumps({"run": str(args.run), "objective":
+                      "maximise answered_correct - answered_wrong; ties: more "
+                      "answers, then lower thresholds",
+                      "chosen": chosen, "default_0.5_0.5": default}, indent=2))
+    return 0
+
+
 def _options(args: argparse.Namespace) -> ResolverOptions:
     return ResolverOptions(
         retrieve_k=args.retrieve_k,
@@ -602,6 +633,12 @@ def main(argv: list[str] | None = None) -> int:
         help="results directory of an earlier run; its cases never enter the test set",
     )
 
+    cal_cmd = sub.add_parser(
+        "calibrate",
+        help="choose abstention thresholds from a dev always-answer run",
+    )
+    cal_cmd.add_argument("run", type=Path, help="results directory of the run")
+
     resolve_cmd = sub.add_parser(
         "resolve", help="suggest files and an approach for one bug report"
     )
@@ -668,6 +705,13 @@ def main(argv: list[str] | None = None) -> int:
                 f"Is it running? Try `docker compose up -d postgres`.",
                 file=sys.stderr,
             )
+            return 1
+
+    if args.command == "calibrate":
+        try:
+            return _run_calibrate(args)
+        except CalibrationError as exc:
+            print(f"calibrate failed: {exc}", file=sys.stderr)
             return 1
 
     if args.command == "benchmark":

@@ -210,7 +210,8 @@ def _resolution_fields(res: Resolution) -> dict:
         "approach": res.approach,
         "citations": [asdict(c) for c in res.citations],
         "candidates": [
-            {"issue_number": c.issue_number, "pr_number": c.pr_number}
+            {"issue_number": c.issue_number, "pr_number": c.pr_number,
+             "changed_files": list(c.changed_files)}
             for c in res.candidates
         ],
         "screened": [
