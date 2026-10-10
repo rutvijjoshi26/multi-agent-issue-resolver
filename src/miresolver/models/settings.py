@@ -1,8 +1,12 @@
 from collections.abc import Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
+from typing import TYPE_CHECKING
 
 import yaml
+
+if TYPE_CHECKING:
+    from miresolver.models.chat import Usage
 
 TIER_NAMES: tuple[str, ...] = ("embed", "screen", "investigate", "synthesize")
 
@@ -17,6 +21,18 @@ class TierSettings:
     model: str
     base_url: str | None = None
     api_key_env: str | None = None
+    #: US dollars per million tokens. Optional: used only to report and cap
+    #: spend, and a tier without prices reports no dollar figure at all.
+    input_cost_per_mtok: float | None = None
+    output_cost_per_mtok: float | None = None
+
+    def cost(self, usage: "Usage") -> float | None:
+        if self.input_cost_per_mtok is None or self.output_cost_per_mtok is None:
+            return None
+        return (
+            usage.input_tokens * self.input_cost_per_mtok
+            + usage.output_tokens * self.output_cost_per_mtok
+        ) / 1_000_000
 
 
 @dataclass(frozen=True)
@@ -41,7 +57,18 @@ def _tier_from_mapping(name: str, raw: object) -> TierSettings:
         model=str(raw["model"]),
         base_url=raw.get("base_url"),
         api_key_env=raw.get("api_key_env"),
+        input_cost_per_mtok=_price(name, raw, "input_cost_per_mtok"),
+        output_cost_per_mtok=_price(name, raw, "output_cost_per_mtok"),
     )
+
+
+def _price(name: str, raw: Mapping, field: str) -> float | None:
+    value = raw.get(field)
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ModelConfigError(f"tier {name} {field} must be a number")
+    return float(value)
 
 
 def load_model_settings(text: str) -> ModelSettings:

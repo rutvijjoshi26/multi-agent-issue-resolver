@@ -77,3 +77,45 @@ def test_every_provider_dispatches_to_its_own_adapter_not_a_fallback(provider):
     settings = load_model_settings(settings_for(provider, base_url=base_url))
     embedder = build_embedder(settings, ENV)
     assert type(embedder) is _EXPECTED_ADAPTER[provider]
+
+
+def chat_settings(provider: str, *, base_url: str | None = None):
+    url = f", base_url: '{base_url}'" if base_url else ""
+    return load_model_settings(
+        "tiers:\n"
+        "  embed: {provider: openai-compatible, base_url: 'http://h/v1', model: e, api_key_env: TEST_KEY}\n"
+        f"  screen: {{provider: {provider}, model: s, api_key_env: TEST_KEY{url}}}\n"
+        "  investigate: {provider: anthropic, model: i, api_key_env: TEST_KEY}\n"
+        "  synthesize: {provider: gemini, model: y, api_key_env: TEST_KEY}\n"
+    )
+
+
+def test_build_chat_picks_the_adapter_named_by_the_tier():
+    from miresolver.models.anthropic import AnthropicChat
+    from miresolver.models.chat import OpenAICompatibleChat
+    from miresolver.models.factory import build_chat
+    from miresolver.models.gemini import GeminiChat
+
+    settings = chat_settings("openai-compatible", base_url="http://h/v1")
+    clients = [build_chat(settings, t, ENV) for t in ("screen", "investigate", "synthesize")]
+    assert [type(c) for c in clients] == [OpenAICompatibleChat, AnthropicChat, GeminiChat]
+    for c in clients:
+        asyncio.run(c.aclose())
+
+
+def test_build_chat_rejects_the_embed_tier_and_unknown_providers():
+    from miresolver.models.factory import build_chat
+
+    settings = chat_settings("mystery")
+    with pytest.raises(ModelConfigError, match="embed"):
+        build_chat(settings, "embed", ENV)
+    with pytest.raises(ModelConfigError, match="mystery"):
+        build_chat(settings, "screen", ENV)
+
+
+def test_build_chat_requires_the_key():
+    from miresolver.models.factory import build_chat
+
+    settings = chat_settings("anthropic")
+    with pytest.raises(ModelConfigError, match="TEST_KEY"):
+        build_chat(settings, "screen", {})

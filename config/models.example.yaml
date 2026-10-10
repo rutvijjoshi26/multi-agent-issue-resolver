@@ -7,6 +7,11 @@
 # provider: anthropic and provider: gemini talk to those APIs natively.
 #
 # Replace every model id below with one your provider actually serves.
+#
+# Optional on any tier: input_cost_per_mtok and output_cost_per_mtok, in US
+# dollars per million tokens. They are used only to estimate, report and cap
+# evaluation spend. A tier without them reports token counts and no dollar
+# figure. config/models.openai.example.yaml is a filled-in OpenAI example.
 tiers:
   embed:
     provider: openai-compatible

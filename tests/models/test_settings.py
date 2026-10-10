@@ -89,3 +89,40 @@ def test_tiers_mapping_is_immutable():
         settings.tiers["embed"] = TierSettings(
             provider="anthropic", model="new-model"
         )
+
+
+PRICED_YAML = """
+tiers:
+  embed: {provider: openai-compatible, base_url: "http://x/v1", model: e, api_key_env: K}
+  screen:
+    provider: openai-compatible
+    base_url: "http://x/v1"
+    model: s
+    api_key_env: K
+    input_cost_per_mtok: 0.15
+    output_cost_per_mtok: 0.6
+  investigate: {provider: anthropic, model: i, api_key_env: K}
+  synthesize: {provider: gemini, model: y, api_key_env: K}
+"""
+
+
+def test_prices_are_optional_and_parsed_as_floats():
+    settings = load_model_settings(PRICED_YAML)
+    assert settings.tier("screen").input_cost_per_mtok == 0.15
+    assert settings.tier("screen").output_cost_per_mtok == 0.6
+    assert settings.tier("investigate").input_cost_per_mtok is None
+
+
+def test_cost_is_none_without_prices_and_dollars_with_them():
+    from miresolver.models.chat import Usage
+
+    settings = load_model_settings(PRICED_YAML)
+    usage = Usage(input_tokens=2_000_000, output_tokens=1_000_000)
+    assert settings.tier("investigate").cost(usage) is None
+    assert settings.tier("screen").cost(usage) == pytest.approx(0.9)
+
+
+def test_non_numeric_price_is_a_config_error():
+    bad = PRICED_YAML.replace("0.15", "cheap")
+    with pytest.raises(ModelConfigError, match="input_cost_per_mtok"):
+        load_model_settings(bad)
