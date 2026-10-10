@@ -80,3 +80,13 @@ def test_summary_of_nothing_has_nulls_not_errors():
     assert summary["cases"] == 0
     assert summary["accuracy_when_answering"] is None
     assert summary["latency_s"] == {"median": None, "p95": None}
+
+
+def test_summary_splits_cases_by_whether_a_precedent_was_retrieved():
+    summary = summarize(_fixture_scores(), [1.0, 2.0, 3.0, 4.0, 5.0])
+    assert summary["with_precedent"] == {
+        "cases": 3, "hit_at_3": 1.0, "abstention_rate": 0.3333,
+    }
+    assert summary["without_precedent"] == {
+        "cases": 2, "hit_at_3": 0.0, "abstention_rate": 0.5,
+    }

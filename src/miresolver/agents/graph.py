@@ -73,32 +73,42 @@ def query_text(issue: NewIssue) -> str:
     return f"{issue.title}\n\n{issue.body}".strip()[:MAX_EMBED_CHARS]
 
 
+async def retrieve_candidates(
+    retriever: Retriever, issue: NewIssue, *, k: int, exclude: Exclude | None
+) -> list[Candidate]:
+    """Up to k usable precedents, in retrieval order.
+
+    Shared by the workflow and the retrieval-only check, so both see
+    exactly the same candidates under the same filters.
+    """
+    query = query_text(issue)
+    limit = k * OVERFETCH
+    while True:
+        hits = await retriever(query, limit)
+        candidates = [Candidate.from_hit(h, rank) for rank, h in enumerate(hits)]
+        # The index keeps issues with no merged fix as symptom matches,
+        # but they carry no resolution, so they are not precedents.
+        candidates = [
+            c for c in candidates if c.pr_number is not None and c.changed_files
+        ]
+        if exclude:
+            candidates = [c for c in candidates if not exclude(c)]
+        # Stop once k survive, the index has nothing more to give, or the
+        # cap is reached.
+        if len(candidates) >= k or len(hits) < limit or limit >= MAX_RETRIEVE:
+            break
+        limit = min(limit * WIDEN_FACTOR, MAX_RETRIEVE)
+    return [replace(c, retrieval_rank=rank) for rank, c in enumerate(candidates[:k])]
+
+
 def build_graph(deps: ResolverDeps) -> Any:
     options = deps.options
 
     async def retrieve_node(state: ResolveState) -> dict:
-        exclude = state.get("exclude")
-        k = options.retrieve_k
-        query = query_text(state["issue"])
-        limit = k * OVERFETCH
-        while True:
-            hits = await deps.retriever(query, limit)
-            candidates = [Candidate.from_hit(h, rank) for rank, h in enumerate(hits)]
-            # The index keeps issues with no merged fix as symptom matches,
-            # but they carry no resolution, so they are not precedents.
-            candidates = [
-                c for c in candidates if c.pr_number is not None and c.changed_files
-            ]
-            if exclude:
-                candidates = [c for c in candidates if not exclude(c)]
-            # Stop once k survive, the index has nothing more to give, or
-            # the cap is reached.
-            if len(candidates) >= k or len(hits) < limit or limit >= MAX_RETRIEVE:
-                break
-            limit = min(limit * WIDEN_FACTOR, MAX_RETRIEVE)
-        candidates = [
-            replace(c, retrieval_rank=rank) for rank, c in enumerate(candidates[:k])
-        ]
+        candidates = await retrieve_candidates(
+            deps.retriever, state["issue"], k=options.retrieve_k,
+            exclude=state.get("exclude"),
+        )
         return {"candidates": candidates, "verdicts": [], "usage": []}
 
     async def screen_node(state: ResolveState) -> dict:
@@ -159,6 +169,8 @@ def build_graph(deps: ResolverDeps) -> Any:
         result = await synthesize(
             state["issue"], verdicts, deps.synthesize_chat,
             threshold=options.abstain_threshold,
+            synthesis_threshold=options.synthesis_threshold,
+            always_answer=options.always_answer,
         )
         return {
             "synthesis": result,
@@ -218,7 +230,8 @@ async def resolve(
     if synthesis is None:
         return Resolution(
             approach="", files=(), citations=(), confidence=0.0,
-            abstained=True, abstain_reason=state.get("abstain_reason"), **common,
+            abstained=not deps.options.always_answer,
+            abstain_reason=state.get("abstain_reason"), **common,
         )
     return Resolution(
         approach=synthesis.approach,

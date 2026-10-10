@@ -112,7 +112,15 @@ class ResolverOptions:
     retrieve_k: int = 10
     investigate_n: int = 3
     screen_floor: float = 0.2
+    #: Minimum confidence of an applicable verdict for the system to answer.
     abstain_threshold: float = 0.5
+    #: Minimum synthesizer confidence to answer; None means abstain_threshold.
+    synthesis_threshold: float | None = None
+    #: Never abstain. Used to report coverage-style metrics alongside the
+    #: abstaining mode; the would-be abstention reason is still recorded.
+    always_answer: bool = False
+    #: "hybrid" (dense and BM25 fused by rank), "dense" or "keyword".
+    retrieval: str = "hybrid"
     investigator_timeout_s: float = 90.0
     file_char_budget: int = 6000
     max_files_per_candidate: int = 5

@@ -98,6 +98,15 @@ def _file_metrics(scores: Sequence[CaseScore]) -> dict:
     }
 
 
+def _split(scores: Sequence[CaseScore]) -> dict:
+    n = len(scores)
+    return {
+        "cases": n,
+        "hit_at_3": _rate(sum(s.hit_at_3 for s in scores), n),
+        "abstention_rate": _rate(sum(s.abstained for s in scores), n),
+    }
+
+
 def summarize(scores: Sequence[CaseScore], latencies: Sequence[float]) -> dict:
     n = len(scores)
     answered = [s for s in scores if s.answered]
@@ -119,6 +128,12 @@ def summarize(scores: Sequence[CaseScore], latencies: Sequence[float]) -> dict:
         "correct_abstention_rate": _rate(
             sum(s.correct_abstention for s in abstained), len(abstained)
         ),
+        # Whether a retrieved precedent's fix touched an answer file splits
+        # retrieval misses from reasoning misses: hit@3 with a precedent is
+        # what the agents achieve when a right answer was reachable, and
+        # abstention without one is how often they declined to guess.
+        "with_precedent": _split([s for s in scores if s.precedent_available]),
+        "without_precedent": _split([s for s in scores if not s.precedent_available]),
         "latency_s": {
             "median": round(median, 3) if median is not None else None,
             "p95": round(p95, 3) if p95 is not None else None,

@@ -14,7 +14,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.http.exceptions import ApiException, ResponseHandlingException
 
 from miresolver import runtime
-from miresolver.agents.graph import build_graph, resolve
+from miresolver.agents.graph import build_graph, resolve, retrieve_candidates
 from miresolver.agents.types import NewIssue, Resolution, ResolverOptions
 from miresolver.code.reader import CodeReadError
 
@@ -30,6 +30,7 @@ from miresolver.evaluation.runner import (
     EvaluationError,
     estimate_cost,
     run_evaluation,
+    run_retrieval_check,
     select_cases,
 )
 from miresolver.github import GitHubClient
@@ -341,7 +342,10 @@ def _options(args: argparse.Namespace) -> ResolverOptions:
         retrieve_k=args.retrieve_k,
         investigate_n=args.investigators,
         abstain_threshold=args.abstain_threshold,
+        synthesis_threshold=args.synthesis_threshold,
         investigator_timeout_s=args.investigator_timeout,
+        always_answer=args.mode == "always-answer",
+        retrieval=args.retrieval,
     )
 
 
@@ -442,16 +446,45 @@ def _run_evaluate(args: argparse.Namespace) -> int:
     texts = _load_case_texts(
         _database_url(env, "evaluate"), [c.issue_number for c in cases]
     )
+    meta = manifest.get("meta", {})
     run_meta = {
         "set": args.set,
         "seed": args.seed,
         "limit": args.limit,
+        "mode": args.mode,
+        "tag": args.tag or (args.mode if args.mode != "abstain" else None),
         "manifest": str(args.manifest),
-        "manifest_generated_at": manifest.get("meta", {}).get("generated_at"),
-        "manifest_seed": manifest.get("meta", {}).get("seed"),
+        "manifest_version": meta.get("version", 1),
+        "manifest_generated_at": meta.get("generated_at"),
+        "manifest_created_at": meta.get("created_at"),
+        "manifest_seed": meta.get("seed"),
+        "test_sha256": meta.get("test_sha256") if args.set == "test" else None,
         "options": asdict(options),
         "estimate": estimate_cost(len(cases), settings, options),
     }
+
+    if args.retrieval_only:
+        async def check() -> Path:
+            async with runtime.open_runtime(
+                settings, env, **_runtime_kwargs(args, settings, env)
+            ) as deps:
+                async def retrieve(issue, exclude, k):
+                    return await retrieve_candidates(
+                        deps.retriever, issue, k=k, exclude=exclude
+                    )
+
+                return await run_retrieval_check(
+                    cases, issue_text=texts.get, retrieve=retrieve,
+                    out_root=args.out_root,
+                    run_meta={k: v for k, v in run_meta.items() if k != "estimate"},
+                    progress=lambda line: print(line, file=sys.stderr, flush=True),
+                )
+
+        out_dir = asyncio.run(check())
+        summary = json.loads((out_dir / "summary.json").read_text())
+        print(f"results written to {out_dir}")
+        print(f"precedent available at depth: {summary['precedent_available_at']}")
+        return 0
 
     async def go() -> Path:
         async with runtime.open_runtime(
@@ -496,6 +529,17 @@ def _add_runtime_flags(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--retrieve-k", type=int, default=10)
     parser.add_argument("--investigators", type=int, default=3)
     parser.add_argument("--abstain-threshold", type=float, default=0.5)
+    parser.add_argument(
+        "--synthesis-threshold", type=float, default=None,
+        help="minimum synthesizer confidence to answer; defaults to --abstain-threshold",
+    )
+    parser.add_argument(
+        "--mode", choices=("abstain", "always-answer"), default="abstain",
+        help="always-answer never abstains, for coverage-style metrics",
+    )
+    parser.add_argument(
+        "--retrieval", choices=("hybrid", "dense", "keyword"), default="hybrid",
+    )
     parser.add_argument("--investigator-timeout", type=float, default=90.0)
 
 
@@ -590,6 +634,11 @@ def main(argv: list[str] | None = None) -> int:
     eval_cmd.add_argument("--estimate", action="store_true")
     eval_cmd.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST_PATH)
     eval_cmd.add_argument("--out-root", type=Path, default=DEFAULT_RESULTS_ROOT)
+    eval_cmd.add_argument(
+        "--retrieval-only", action="store_true",
+        help="score retrieval alone (precedent availability by depth); no chat calls",
+    )
+    eval_cmd.add_argument("--tag", default=None, help="suffix for the run directory")
     _add_runtime_flags(eval_cmd)
 
     args = parser.parse_args(argv)

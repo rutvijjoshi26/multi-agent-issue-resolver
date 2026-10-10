@@ -22,5 +22,15 @@
     "median": 3.0,
     "p95": 5.0
   },
-  "precedent_available_rate": 0.6
+  "precedent_available_rate": 0.6,
+  "with_precedent": {
+    "abstention_rate": 0.3333,
+    "cases": 3,
+    "hit_at_3": 1.0
+  },
+  "without_precedent": {
+    "abstention_rate": 0.5,
+    "cases": 2,
+    "hit_at_3": 0.0
+  }
 }

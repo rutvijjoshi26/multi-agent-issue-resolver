@@ -159,3 +159,71 @@ def test_evaluate_runs_and_writes_results(models, tmp_path, monkeypatch, capsys)
     assert summary["run"]["options"]["retrieve_k"] == 10
     assert summary["models"]["synthesize"]["model"] == "big"
     assert str(run_dir) in capsys.readouterr().out
+
+
+def _eval_env(monkeypatch):
+    monkeypatch.setattr(cli, "_load_case_texts",
+                        lambda url, numbers: {n: (f"t{n}", "b") for n in numbers})
+    monkeypatch.setenv("DATABASE_URL", "postgresql://u:p@h/db")
+
+
+def test_evaluate_always_answer_mode_is_recorded_and_tagged(models, tmp_path, monkeypatch):
+    install_fake_runtime(monkeypatch, conf=0.1, synth_conf=0.1)
+    _eval_env(monkeypatch)
+    out_root = tmp_path / "results"
+    code = main(["evaluate", "--models", str(models), "--manifest", str(write_manifest(tmp_path)),
+                 "--out-root", str(out_root), "--mode", "always-answer",
+                 "--synthesis-threshold", "0.7", "--retrieval", "dense"])
+    assert code == 0
+    [run_dir] = list(out_root.iterdir())
+    assert run_dir.name.endswith("-always-answer")
+    summary = json.loads((run_dir / "summary.json").read_text())
+    options = summary["run"]["options"]
+    assert options["always_answer"] is True
+    assert options["synthesis_threshold"] == 0.7
+    assert options["retrieval"] == "dense"
+    assert summary["metrics"]["abstention_rate"] == 0.0
+
+
+def test_evaluate_refuses_the_test_set_without_final(models, tmp_path, capsys):
+    path = tmp_path / "v2.json"
+    path.write_text(json.dumps({"dev": [], "test": [], "meta": {"version": 2}}))
+    code = main(["evaluate", "--set", "test", "--estimate", "--models", str(models),
+                 "--manifest", str(path)])
+    assert code == 1 and "--final" in capsys.readouterr().err
+
+
+def test_evaluate_retrieval_only_makes_no_chat_calls(models, tmp_path, monkeypatch, capsys):
+    install_fake_runtime(monkeypatch, hits=[hit(1, pr=10, files=("src/f2.ts",)), hit(2, pr=20)])
+    _eval_env(monkeypatch)
+    out_root = tmp_path / "results"
+    code = main(["evaluate", "--models", str(models), "--manifest", str(write_manifest(tmp_path)),
+                 "--out-root", str(out_root), "--retrieval-only"])
+    assert code == 0
+    [run_dir] = list(out_root.iterdir())
+    assert run_dir.name.startswith("retrieval-dev-n4-")
+    summary = json.loads((run_dir / "summary.json").read_text())
+    assert summary["counts"]["scored"] == 4
+    # Only case 2 has a precedent (issue 1 touched src/f2.ts), at rank 1;
+    # issue 1 is case 1's own issue and is filtered out for it.
+    assert summary["precedent_available_at"]["1"] == 0.25
+    assert summary["precedent_available_at"]["3"] == 0.25
+
+
+def test_evaluate_records_the_manifest_version_and_test_digest(models, tmp_path, monkeypatch):
+    install_fake_runtime(monkeypatch)
+    _eval_env(monkeypatch)
+    from miresolver.benchmark import digest_cases
+    cases = [{"issue_number": i, "pr_number": 100 + i, "base_commit": SHA,
+              "changed_files": [f"src/f{i}.ts"]} for i in range(1, 4)]
+    path = tmp_path / "v2.json"
+    path.write_text(json.dumps({"dev": cases[:1], "test": cases[1:], "meta": {
+        "version": 2, "seed": 4, "created_at": "c", "test_sha256": digest_cases(cases[1:])}}))
+    out_root = tmp_path / "results"
+    assert main(["evaluate", "--set", "test", "--final", "--models", str(models),
+                 "--manifest", str(path), "--out-root", str(out_root)]) == 0
+    [run_dir] = list(out_root.iterdir())
+    run = json.loads((run_dir / "summary.json").read_text())["run"]
+    assert run["manifest_version"] == 2
+    assert run["manifest_created_at"] == "c"
+    assert run["test_sha256"] == digest_cases(cases[1:])

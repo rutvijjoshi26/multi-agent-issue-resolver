@@ -54,22 +54,35 @@ async def synthesize(
     chat: ChatClient,
     *,
     threshold: float,
+    synthesis_threshold: float | None = None,
+    always_answer: bool = False,
 ) -> SynthesisResult:
     """Merge investigator verdicts into one answer, or abstain.
 
     Abstention is decided by fixed rules over the verdicts and the
     synthesizer's stated confidence, so a model that is overconfident in
-    its prose still cannot answer without a confident precedent behind it.
+    its prose still cannot answer without a confident precedent behind it:
+    the system abstains when no applicable verdict reaches `threshold`, or
+    when the synthesizer's confidence is below `synthesis_threshold`
+    (which defaults to `threshold`).
+
+    With always_answer the synthesizer is consulted whenever any verdict
+    is usable and the result is never an abstention; `reason` still
+    records what the abstaining rule would have decided, so one run can be
+    analysed under both policies.
     """
+    gate = threshold if synthesis_threshold is None else synthesis_threshold
     usable = [v for v in verdicts if not v.failed]
     if not usable:
-        return SynthesisResult("", (), (), 0.0, True, "no_verdicts", Usage())
+        return SynthesisResult(
+            "", (), (), 0.0, not always_answer, "no_verdicts", Usage()
+        )
 
     confident = sorted(
         (v for v in usable if v.applies and v.confidence >= threshold),
         key=lambda v: -v.confidence,
     )
-    if not confident:
+    if not confident and not always_answer:
         best = max(usable, key=lambda v: (v.applies, v.confidence))
         return SynthesisResult(
             approach=best.approach,
@@ -81,8 +94,13 @@ async def synthesize(
             usage=Usage(),
         )
 
-    strongest = confident[0]
-    fallback_files = tuple(merge_verdict_files([v for v in usable if v.applies]))
+    ranked = sorted(usable, key=lambda v: (not v.applies, -v.confidence))
+    strongest = confident[0] if confident else ranked[0]
+    fallback_files = (
+        tuple(merge_verdict_files([v for v in usable if v.applies]))
+        if confident
+        else _would_be_files(usable)
+    )
     usage = Usage()
     try:
         result = await chat.complete(
@@ -100,11 +118,11 @@ async def synthesize(
     except Exception:  # any synthesis failure falls back to the verdicts
         return SynthesisResult(
             approach=strongest.approach,
-            files=tuple(merge_verdict_files(confident)),
-            citations=_cite(confident),
-            confidence=strongest.confidence,
+            files=tuple(merge_verdict_files(confident)) if confident else fallback_files,
+            citations=_cite(confident or [v for v in usable if v.applies]),
+            confidence=strongest.confidence if strongest.applies else 0.0,
             abstained=False,
-            reason=None,
+            reason=None if confident else "no_confident_precedent",
             usage=usage,
             fallback=True,
         )
@@ -120,13 +138,18 @@ async def synthesize(
         if v is not None and v not in cited:
             cited.append(v)
 
-    low = confidence < threshold
+    if not confident:
+        reason = "no_confident_precedent"
+    elif confidence < gate:
+        reason = "low_synthesis_confidence"
+    else:
+        reason = None
     return SynthesisResult(
         approach=str(data.get("approach") or strongest.approach),
         files=clean_paths(data.get("files")) or fallback_files,
         citations=_cite(cited or confident),
         confidence=confidence,
-        abstained=low,
-        reason="low_synthesis_confidence" if low else None,
+        abstained=reason is not None and not always_answer,
+        reason=reason,
         usage=usage,
     )

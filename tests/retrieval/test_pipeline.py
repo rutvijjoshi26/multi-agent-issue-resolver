@@ -141,3 +141,30 @@ def test_search_fuses_keyword_hits_the_dense_side_missed(qdrant):
     # The fake embedder's vectors carry no meaning, so only the keyword
     # side can put issue 1 first.
     assert [h.issue_number for h in hits] == [1]
+
+
+def _hybrid_corpus(qdrant, collection):
+    index = IssueIndex(qdrant, collection=collection)
+    corpus = [
+        CandidateIssue(n, title, "", ("bug",), ())
+        for n, title in ((1, "ErrInvalidConfigFormat thrown"), (2, "window flickers"))
+    ]
+    embedder = FakeEmbedder()
+    asyncio.run(build_index([build_document(i) for i in corpus], embedder, index))
+    return index, embedder
+
+
+def test_search_can_run_dense_only_or_keyword_only(qdrant):
+    index, embedder = _hybrid_corpus(qdrant, "test_pipeline_modes")
+    keyword = asyncio.run(
+        search("ErrInvalidConfigFormat", embedder, index, limit=5, mode="keyword")
+    )
+    assert [h.issue_number for h in keyword] == [1]
+    dense = asyncio.run(search("ErrInvalidConfigFormat", embedder, index, limit=5, mode="dense"))
+    assert {h.issue_number for h in dense} == {1, 2}
+
+
+def test_search_rejects_an_unknown_mode(qdrant):
+    index, embedder = _hybrid_corpus(qdrant, "test_pipeline_badmode")
+    with pytest.raises(ValueError, match="mode"):
+        asyncio.run(search("x", embedder, index, limit=5, mode="fuzzy"))

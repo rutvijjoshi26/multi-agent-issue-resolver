@@ -175,3 +175,37 @@ def test_retrieval_does_not_widen_when_the_first_fetch_suffices():
     d = deps([hit(n) for n in range(1, 60)], options=ResolverOptions(retrieve_k=3), seen=seen)
     asyncio.run(resolve(ISSUE, d))
     assert len(seen) == 1
+
+
+def test_always_answer_never_abstains_even_with_no_candidates():
+    d = deps([], options=ResolverOptions(always_answer=True))
+    result = asyncio.run(resolve(ISSUE, d))
+    assert not result.abstained and result.files == ()
+    assert result.abstain_reason == "no_candidates"
+
+
+def test_always_answer_synthesizes_a_low_confidence_case():
+    low = ScriptedChat(respond=lambda p: {**verdict_for(p), "confidence": 0.1})
+    d = deps([hit(1), hit(2)], investigate=low,
+             options=ResolverOptions(always_answer=True))
+    result = asyncio.run(resolve(ISSUE, d))
+    assert not result.abstained
+    assert result.files == ("src/f1.ts", "src/f2.ts")
+    assert len(d.synthesize_chat.calls) == 1
+
+
+def test_the_synthesis_threshold_option_reaches_the_synthesizer():
+    d = deps([hit(1), hit(2)], options=ResolverOptions(synthesis_threshold=0.9))
+    result = asyncio.run(resolve(ISSUE, d))
+    assert result.abstained and result.abstain_reason == "low_synthesis_confidence"
+
+
+def test_retrieve_candidates_applies_the_same_filters_as_the_graph():
+    from miresolver.agents.graph import retrieve_candidates
+
+    hits = [hit(1), hit(2, files=()), hit(3), hit(4)]
+    found = asyncio.run(retrieve_candidates(
+        retriever_of(hits), ISSUE, k=2, exclude=lambda c: c.issue_number == 1,
+    ))
+    assert [c.issue_number for c in found] == [3, 4]
+    assert [c.retrieval_rank for c in found] == [0, 1]

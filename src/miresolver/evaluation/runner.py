@@ -233,6 +233,91 @@ def _resolution_fields(res: Resolution) -> dict:
     }
 
 
+def _run_dir(
+    out_root: Path, run_meta: Mapping[str, object], n: int,
+    timestamp: str | None, prefix: str = "",
+) -> Path:
+    stamp = timestamp or datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    tag = run_meta.get("tag")
+    out_dir = Path(out_root) / (
+        f"{prefix}{run_meta.get('set', 'cases')}-n{n}-"
+        f"seed{run_meta.get('seed')}-{stamp}" + (f"-{tag}" if tag else "")
+    )
+    out_dir.mkdir(parents=True, exist_ok=False)
+    return out_dir
+
+
+def _first_precedent_rank(
+    candidates: Sequence[Candidate], answer: Sequence[str]
+) -> int | None:
+    key = set(answer)
+    for rank, c in enumerate(candidates, start=1):
+        if key.intersection(c.changed_files):
+            return rank
+    return None
+
+
+Retrieve = Callable[[NewIssue, Exclude, int], Awaitable[Sequence[Candidate]]]
+
+
+async def run_retrieval_check(
+    cases: Sequence[EvalCase],
+    *,
+    issue_text: IssueText,
+    retrieve: Retrieve,
+    out_root: Path,
+    run_meta: Mapping[str, object],
+    depths: Sequence[int] = (1, 3, 5, 10, 20, 40),
+    timestamp: str | None = None,
+    progress: Callable[[str], None] | None = None,
+) -> Path:
+    """Retrieval alone, with the same leakage filter and no chat calls.
+
+    For each case, records the rank of the first candidate whose fix
+    touched an answer-key file, and reports the share of cases with such a
+    precedent within each depth. Costs only the query embeddings, so
+    retrieval settings can be compared before any agent run.
+    """
+    out_dir = _run_dir(out_root, run_meta, len(cases), timestamp, prefix="retrieval-")
+    deepest = max(depths)
+    ranks: list[int | None] = []
+    counts = {"selected": len(cases), "scored": 0, "skipped_no_text": 0}
+    with (out_dir / "cases.jsonl").open("w") as log:
+        for i, case in enumerate(cases):
+            text = issue_text(case.issue_number)
+            if text is None:
+                counts["skipped_no_text"] += 1
+                record = _case_record(case, "skipped_no_text")
+            else:
+                issue = NewIssue(text[0], text[1], case.base_commit, case.issue_number)
+                found = await retrieve(issue, leakage_filter(case), deepest)
+                rank = _first_precedent_rank(found, case.changed_files)
+                ranks.append(rank)
+                counts["scored"] += 1
+                record = _case_record(
+                    case, "scored", first_precedent_rank=rank,
+                    candidates=[
+                        {"issue_number": c.issue_number, "pr_number": c.pr_number}
+                        for c in found
+                    ],
+                )
+            log.write(json.dumps(record, sort_keys=True) + "\n")
+            if progress:
+                progress(f"[{i + 1}/{len(cases)}] #{case.issue_number} "
+                         f"first precedent at {record.get('first_precedent_rank')}")
+    n = len(ranks)
+    summary = {
+        "run": dict(run_meta),
+        "counts": counts,
+        "precedent_available_at": {
+            str(d): (round(sum(r is not None and r <= d for r in ranks) / n, 4) if n else None)
+            for d in depths
+        },
+    }
+    (out_dir / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
+    return out_dir
+
+
 async def run_evaluation(
     cases: Sequence[EvalCase],
     *,
@@ -245,12 +330,7 @@ async def run_evaluation(
     timestamp: str | None = None,
     progress: Callable[[str], None] | None = None,
 ) -> Path:
-    stamp = timestamp or datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
-    out_dir = Path(out_root) / (
-        f"{run_meta.get('set', 'cases')}-n{len(cases)}-"
-        f"seed{run_meta.get('seed')}-{stamp}"
-    )
-    out_dir.mkdir(parents=True, exist_ok=False)
+    out_dir = _run_dir(out_root, run_meta, len(cases), timestamp)
     started_at = datetime.now(UTC).isoformat(timespec="seconds")
 
     scores, latencies = [], []

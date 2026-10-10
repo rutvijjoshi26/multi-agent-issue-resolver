@@ -100,3 +100,52 @@ def test_a_non_list_cited_issues_value_does_not_crash():
     chat = ScriptedChat([{"approach": "a", "files": ["a.ts"], "cited_issues": 5, "confidence": 0.9}])
     result = run([verdict(1)], chat)
     assert result.citations == (Citation(1, 10),)
+
+
+def run_always(verdicts, chat, threshold=0.5):
+    return asyncio.run(
+        synthesize(ISSUE, verdicts, chat, threshold=threshold, always_answer=True)
+    )
+
+
+SYNTH = {"approach": "guard null", "files": ["m.ts"], "cited_issues": [1], "confidence": 0.2}
+
+
+def test_always_answer_synthesizes_even_without_a_confident_precedent():
+    chat = ScriptedChat([SYNTH])
+    result = run_always([verdict(1, conf=0.3, files=("x.ts",))], chat)
+    assert len(chat.calls) == 1
+    assert not result.abstained
+    assert result.files == ("m.ts",)
+    # What the abstaining rule would have decided is kept for analysis.
+    assert result.reason == "no_confident_precedent"
+
+
+def test_always_answer_ignores_a_low_synthesis_confidence():
+    chat = ScriptedChat([SYNTH])
+    result = run_always([verdict(1, conf=0.9)], chat)
+    assert not result.abstained and result.confidence == 0.2
+    assert result.reason == "low_synthesis_confidence"
+
+
+def test_always_answer_falls_back_to_the_verdicts_when_synthesis_fails():
+    chat = ScriptedChat([ChatError("down")])
+    result = run_always([verdict(1, applies=False, conf=0.3, files=("x.ts",))], chat)
+    assert not result.abstained and result.fallback
+    assert result.files == ("x.ts",)
+
+
+def test_always_answer_with_no_usable_verdicts_answers_nothing():
+    result = run_always([verdict(1, error="boom")], ScriptedChat([]))
+    assert not result.abstained and result.files == ()
+    assert result.reason == "no_verdicts"
+
+
+def test_the_synthesis_gate_can_be_set_apart_from_the_verdict_gate():
+    reply = dict(SYNTH, confidence=0.6)
+    loose = asyncio.run(synthesize(ISSUE, [verdict(1, conf=0.9)], ScriptedChat([reply]),
+                                   threshold=0.5))
+    strict = asyncio.run(synthesize(ISSUE, [verdict(1, conf=0.9)], ScriptedChat([reply]),
+                                    threshold=0.5, synthesis_threshold=0.7))
+    assert not loose.abstained
+    assert strict.abstained and strict.reason == "low_synthesis_confidence"

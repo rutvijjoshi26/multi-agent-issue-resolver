@@ -50,7 +50,9 @@ async def open_runtime(
         index = IssueIndex(qdrant, collection=collection)
 
         async def retrieve(query: str, limit: int):
-            return await search(query, embedder, index, limit=limit)
+            return await search(
+                query, embedder, index, limit=limit, mode=options.retrieval
+            )
 
         yield ResolverDeps(
             retriever=retrieve,

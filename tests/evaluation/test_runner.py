@@ -240,3 +240,45 @@ def test_a_test_set_that_no_longer_matches_its_digest_is_refused():
     manifest["test"][0]["changed_files"] = ["src/other.ts"]
     with pytest.raises(EvaluationError, match="digest"):
         select_cases(manifest, which="test", limit=None, seed=0, allow_test=True)
+
+
+def test_retrieval_check_reports_precedent_availability_at_each_depth(tmp_path):
+    from miresolver.evaluation.runner import run_retrieval_check
+
+    cases = select_cases(MANIFEST, which="dev", limit=2, seed=1)
+    first, second = cases
+
+    async def retrieve(issue, exclude, k):
+        assert exclude(cand(issue.number, 1))
+        if issue.number == first.issue_number:
+            files = [("x.ts",), ("y.ts",), (f"src/{first.issue_number}.ts",)]
+        else:
+            files = [("x.ts",)]
+        return [Candidate(100 + i, "t", "b", 5, f, i) for i, f in enumerate(files)][:k]
+
+    out = asyncio.run(run_retrieval_check(
+        cases, issue_text=lambda n: ("t", "b"), retrieve=retrieve,
+        out_root=tmp_path, run_meta={"set": "dev", "seed": 1},
+        depths=(1, 3), timestamp="20261010T000000Z",
+    ))
+    assert out.name == "retrieval-dev-n2-seed1-20261010T000000Z"
+    summary = json.loads((out / "summary.json").read_text())
+    assert summary["precedent_available_at"] == {"1": 0.0, "3": 0.5}
+    assert summary["counts"]["scored"] == 2
+    lines = [json.loads(l) for l in (out / "cases.jsonl").read_text().splitlines()]
+    assert lines[0]["first_precedent_rank"] == 3
+    assert lines[1]["first_precedent_rank"] is None
+
+
+def test_a_run_tag_is_appended_to_the_directory_name(tmp_path):
+    cases = select_cases(MANIFEST, which="dev", limit=1, seed=1)
+
+    async def resolver(issue, exclude):
+        return resolution([])
+
+    out = asyncio.run(run_evaluation(
+        cases, issue_text=lambda n: ("t", "b"), resolver=resolver, settings=SETTINGS,
+        out_root=tmp_path, run_meta={"set": "dev", "seed": 3, "tag": "always-answer"},
+        timestamp="20261010T000000Z",
+    ))
+    assert out.name == "dev-n1-seed3-20261010T000000Z-always-answer"

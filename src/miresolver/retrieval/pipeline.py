@@ -39,22 +39,38 @@ async def build_index(
     return indexed
 
 
+SEARCH_MODES = ("hybrid", "dense", "keyword")
+
+
 async def search(
     query: str,
     embedder: EmbeddingClient,
     index: IssueIndex,
     *,
     limit: int = 10,
+    mode: str = "hybrid",
 ) -> list[SearchHit]:
     """Dense and keyword search over the same query, fused by rank.
+
+    mode "dense" or "keyword" runs one side alone, for ablations.
 
     A never-created collection (e.g. an empty corpus was indexed and nothing
     was ever written) is treated as an empty index rather than an error: the
     caller gets no hits back instead of a raw "collection not found" failure.
     """
+    if mode not in SEARCH_MODES:
+        raise ValueError(f"unknown search mode {mode!r}; use one of {SEARCH_MODES}")
     if not index.exists():
         return []
-    vectors = await embedder.embed([query])
-    dense = index.search_dense(vectors[0], limit=limit)
-    keyword = index.search_keyword(query, limit=limit)
+    dense: list[SearchHit] = []
+    keyword: list[SearchHit] = []
+    if mode in ("hybrid", "dense"):
+        vectors = await embedder.embed([query])
+        dense = index.search_dense(vectors[0], limit=limit)
+    if mode in ("hybrid", "keyword"):
+        keyword = index.search_keyword(query, limit=limit)
+    if mode == "dense":
+        return dense
+    if mode == "keyword":
+        return keyword
     return fuse(dense, keyword, limit=limit)
