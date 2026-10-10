@@ -54,3 +54,20 @@ def test_readme_documents_every_ingest_flag():
         "--out",
     ):
         assert flag in text, f"undocumented flag: {flag}"
+
+
+def test_readme_documents_every_resolve_and_evaluate_flag():
+    text = README.read_text()
+    for flag in (
+        "--base-commit", "--issue", "--body", "--body-file", "--json",
+        "--set", "--allow-full", "--max-cost", "--estimate", "--manifest",
+        "--out-root", "--local-repo", "--code-cache", "--retrieve-k",
+        "--investigators", "--abstain-threshold", "--investigator-timeout",
+    ):
+        assert flag in text, f"undocumented flag: {flag}"
+
+
+def test_readme_status_no_longer_says_agents_are_unbuilt():
+    text = README.read_text()
+    assert "not built yet" not in text
+    assert "eval/results" in text
