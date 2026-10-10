@@ -76,18 +76,7 @@ def test_round_trip_dense_search_returns_the_nearest_document(qdrant):
     assert hits[0].payload["title"] == "issue 1"
 
 
-@pytest.mark.filterwarnings(
-    "ignore:Payload indexes have no effect in the local Qdrant.*:UserWarning"
-)
 def test_keyword_search_finds_an_exact_symbol(qdrant):
-    # The in-memory Qdrant client makes create_payload_index a no-op and
-    # answers MatchText with an in-process scan instead of a real text
-    # index (hence the suppressed warning below). This test therefore
-    # proves the exact-symbol matching behavior works against local mode,
-    # but it cannot catch a wrong index type/tokenizer or an index that
-    # was never created, since a real server would still need the index
-    # to serve MatchText at all. See test_keyword_search_against_a_live_qdrant
-    # for the coverage that exercises the real index path.
     index = IssueIndex(qdrant, collection="test_keyword")
     index.create(vector_size=3)
     issues = [
@@ -115,15 +104,11 @@ def test_create_is_idempotent(qdrant):
 
 
 def test_keyword_search_against_a_live_qdrant(live_qdrant):
-    """Exercises the real text index, which the in-memory client cannot.
+    """The same exact-symbol behavior against a real server.
 
-    Skips unless TEST_QDRANT_URL is set (mirrors the conn fixture's
-    TEST_DATABASE_URL gate). In-memory mode makes create_payload_index a
-    no-op and answers MatchText via an in-process scan regardless of
-    whether a text index exists, so it cannot catch a missing or
-    misconfigured index; a real server needs the index to serve MatchText
-    at all. This test pins the same exact-symbol behavior against a real
-    server so that gap is covered.
+    Skips unless TEST_QDRANT_URL is set. The in-memory client implements
+    sparse vectors and the IDF modifier in process, so this pins the
+    behavior against the real server's implementation as well.
     """
     index = IssueIndex(live_qdrant, collection="test_live_keyword")
     index.create(vector_size=3)
@@ -167,3 +152,81 @@ def test_default_collection_name_handles_an_empty_model_id():
     name = default_collection_name("")
     assert name.startswith("issues__")
     assert re.fullmatch(r"[a-z0-9_-]+", name)
+
+
+def _issue(number: int, title: str, body: str = "b") -> CandidateIssue:
+    return CandidateIssue(
+        number=number, title=title, body=body, labels=("bug",), linked_pr_numbers=()
+    )
+
+
+def _three_issue_index(client, collection: str) -> IssueIndex:
+    index = IssueIndex(client, collection=collection)
+    index.create(vector_size=3)
+    docs = [
+        build_document(_issue(1, "terminal freezes when resizing the panel")),
+        build_document(_issue(2, "editor minimap renders blank after theme change")),
+        build_document(_issue(3, "git blame decorations flicker in the editor")),
+    ]
+    index.upsert(docs, [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
+    return index
+
+
+def test_keyword_search_matches_a_long_query_that_shares_only_some_words(qdrant):
+    # The query is a whole bug report, so most of its words appear in no
+    # stored issue. A conjunctive full-text filter matched nothing here,
+    # which made hybrid retrieval dense-only.
+    index = _three_issue_index(qdrant, "test_keyword_partial")
+    query = (
+        "After upgrading, the integrated terminal freezes completely whenever "
+        "I drag to resize it. Steps: open a shell, drag the sash, observe."
+    )
+    hits = index.search_keyword(query, limit=3)
+    assert hits and hits[0].issue_number == 1
+
+
+def test_keyword_search_ranks_by_overlap(qdrant):
+    index = _three_issue_index(qdrant, "test_keyword_rank")
+    hits = index.search_keyword("editor minimap blank", limit=3)
+    assert [h.issue_number for h in hits][:2] == [2, 3]
+    assert hits[0].score > hits[1].score
+
+
+def test_keyword_search_returns_nothing_for_unrelated_words(qdrant):
+    index = _three_issue_index(qdrant, "test_keyword_none")
+    assert index.search_keyword("zzzunrelated qqqwords", limit=3) == []
+
+
+def test_keyword_search_on_a_collection_without_bm25_asks_for_a_reindex(qdrant):
+    from qdrant_client import models
+
+    from miresolver.retrieval.index import KeywordIndexMissing
+
+    qdrant.create_collection(
+        "test_keyword_legacy",
+        vectors_config=models.VectorParams(size=3, distance=models.Distance.COSINE),
+    )
+    index = IssueIndex(qdrant, collection="test_keyword_legacy")
+    assert not index.has_keyword_vectors()
+    with pytest.raises(KeywordIndexMissing, match="miresolver index"):
+        index.search_keyword("anything", limit=3)
+
+
+def test_create_replaces_a_collection_without_bm25(qdrant):
+    from qdrant_client import models
+
+    qdrant.create_collection(
+        "test_keyword_upgrade",
+        vectors_config=models.VectorParams(size=3, distance=models.Distance.COSINE),
+    )
+    index = IssueIndex(qdrant, collection="test_keyword_upgrade")
+    index.create(vector_size=3)
+    assert index.has_keyword_vectors()
+
+
+def test_ranked_keyword_search_against_a_live_qdrant(live_qdrant):
+    index = _three_issue_index(live_qdrant, "test_live_keyword_rank")
+    hits = index.search_keyword(
+        "the integrated terminal freezes whenever I resize it", limit=3
+    )
+    assert hits and hits[0].issue_number == 1

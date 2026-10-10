@@ -5,8 +5,19 @@ from dataclasses import dataclass
 from qdrant_client import QdrantClient, models
 
 from miresolver.retrieval.documents import IssueDocument
+from miresolver.retrieval.keyword import (
+    average_length,
+    bm25_document_vector,
+    query_vector,
+)
 
 DEFAULT_COLLECTION = "issues"
+#: Named sparse vector holding each document's BM25 term weights.
+KEYWORD_VECTOR = "bm25"
+
+
+class KeywordIndexMissing(RuntimeError):
+    """The collection was built before keyword vectors existed."""
 
 _UNSAFE_CHARS = re.compile(r"[^a-zA-Z0-9_-]+")
 
@@ -78,43 +89,69 @@ class IssueIndex:
     def exists(self) -> bool:
         return self._client.collection_exists(self._collection)
 
+    def has_keyword_vectors(self) -> bool:
+        info = self._client.get_collection(self._collection)
+        sparse = info.config.params.sparse_vectors or {}
+        return KEYWORD_VECTOR in sparse
+
     def create(self, vector_size: int) -> None:
+        """Create the collection, replacing one that predates keyword vectors.
+
+        The index is derived data, rebuilt in full from Postgres by every
+        `miresolver index` run, so an outdated collection is dropped rather
+        than left to serve dense-only results.
+        """
         if self._client.collection_exists(self._collection):
-            return
+            if self.has_keyword_vectors():
+                return
+            self._client.delete_collection(self._collection)
         self._client.create_collection(
             collection_name=self._collection,
             vectors_config=models.VectorParams(
                 size=vector_size, distance=models.Distance.COSINE
             ),
-        )
-        self._client.create_payload_index(
-            collection_name=self._collection,
-            field_name="embed_text",
-            field_schema=models.TextIndexParams(
-                type=models.TextIndexType.TEXT,
-                tokenizer=models.TokenizerType.WORD,
-                lowercase=True,
-            ),
+            sparse_vectors_config={
+                KEYWORD_VECTOR: models.SparseVectorParams(
+                    modifier=models.Modifier.IDF
+                )
+            },
         )
 
     def upsert(
         self,
         documents: Sequence[IssueDocument],
         vectors: Sequence[Sequence[float]],
+        *,
+        avgdl: float | None = None,
     ) -> None:
+        """Write documents with their dense and BM25 vectors.
+
+        avgdl is the corpus-wide average document length in terms; BM25
+        normalises by it, so a caller indexing in batches passes the value
+        for the whole corpus. It defaults to this batch's average.
+        """
         if len(documents) != len(vectors):
             raise ValueError(
                 f"one vector per document required: {len(documents)} documents, "
                 f"{len(vectors)} vectors"
             )
-        points = [
-            models.PointStruct(
-                id=doc.issue_number,
-                vector=list(vector),
-                payload={**doc.payload, "embed_text": doc.embed_text},
+        if avgdl is None:
+            avgdl = average_length([doc.embed_text for doc in documents])
+        points = []
+        for doc, vector in zip(documents, vectors, strict=True):
+            indices, values = bm25_document_vector(doc.embed_text, avgdl=avgdl)
+            points.append(
+                models.PointStruct(
+                    id=doc.issue_number,
+                    vector={
+                        "": list(vector),
+                        KEYWORD_VECTOR: models.SparseVector(
+                            indices=indices, values=values
+                        ),
+                    },
+                    payload=dict(doc.payload),
+                )
             )
-            for doc, vector in zip(documents, vectors, strict=True)
-        ]
         if points:
             self._client.upsert(collection_name=self._collection, points=points)
 
@@ -144,19 +181,27 @@ class IssueIndex:
         return self._to_hits(result.points)
 
     def search_keyword(self, text: str, *, limit: int) -> list[SearchHit]:
-        points, _ = self._client.scroll(
+        """Rank documents by BM25 against the query text.
+
+        Documents need not contain every query word; they are ordered by
+        how many query terms they share, weighted by rarity.
+        """
+        if not self.has_keyword_vectors():
+            raise KeywordIndexMissing(
+                f"collection {self._collection} has no keyword vectors; it was "
+                f"built by an older version. Re-run `miresolver index`."
+            )
+        indices, values = query_vector(text)
+        if not indices:
+            return []
+        result = self._client.query_points(
             collection_name=self._collection,
-            scroll_filter=models.Filter(
-                must=[
-                    models.FieldCondition(
-                        key="embed_text", match=models.MatchText(text=text)
-                    )
-                ]
-            ),
+            query=models.SparseVector(indices=indices, values=values),
+            using=KEYWORD_VECTOR,
             limit=limit,
             with_payload=True,
         )
-        return self._to_hits(points)
+        return self._to_hits(result.points)
 
     def count(self) -> int:
         return self._client.count(

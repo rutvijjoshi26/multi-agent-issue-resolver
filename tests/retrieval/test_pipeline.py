@@ -98,3 +98,46 @@ def test_search_after_indexing_an_empty_corpus_returns_nothing(qdrant):
     assert asyncio.run(build_index([], embedder, index)) == 0
     assert not index.exists()
     assert asyncio.run(search("anything", embedder, index)) == []
+
+
+class RecordingIndex:
+    def __init__(self, inner):
+        self.inner = inner
+        self.avgdls = []
+
+    def create(self, vector_size):
+        self.inner.create(vector_size)
+
+    def upsert(self, documents, vectors, *, avgdl=None):
+        self.avgdls.append(avgdl)
+        self.inner.upsert(documents, vectors, avgdl=avgdl)
+
+
+def test_build_index_normalises_bm25_by_the_whole_corpus(qdrant):
+    from miresolver.retrieval.keyword import average_length
+
+    docs = [build_document(i) for i in issues(4)]
+    recording = RecordingIndex(IssueIndex(qdrant, collection="test_pipeline_avgdl"))
+    asyncio.run(build_index(docs, FakeEmbedder(), recording, batch_size=1))
+    expected = average_length([d.embed_text for d in docs])
+    assert recording.avgdls == [expected] * 4
+
+
+def test_search_fuses_keyword_hits_the_dense_side_missed(qdrant):
+    index = IssueIndex(qdrant, collection="test_pipeline_hybrid")
+    corpus = [
+        CandidateIssue(
+            number=n, title=title, body="", labels=("bug",), linked_pr_numbers=()
+        )
+        for n, title in (
+            (1, "ErrInvalidConfigFormat thrown at startup"),
+            (2, "window flickers"),
+            (3, "menu missing"),
+        )
+    ]
+    embedder = FakeEmbedder()
+    asyncio.run(build_index([build_document(i) for i in corpus], embedder, index))
+    hits = asyncio.run(search("ErrInvalidConfigFormat", embedder, index, limit=1))
+    # The fake embedder's vectors carry no meaning, so only the keyword
+    # side can put issue 1 first.
+    assert [h.issue_number for h in hits] == [1]

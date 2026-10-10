@@ -3,6 +3,7 @@ from collections.abc import Sequence
 from miresolver.models.embedding import EmbeddingClient
 from miresolver.retrieval.documents import IssueDocument
 from miresolver.retrieval.index import IssueIndex, SearchHit, fuse
+from miresolver.retrieval.keyword import average_length
 
 
 async def build_index(
@@ -21,6 +22,9 @@ async def build_index(
     if not documents:
         return 0
 
+    # BM25 normalises each document by the corpus-wide average length, so
+    # it is computed once here rather than per batch.
+    avgdl = average_length([doc.embed_text for doc in documents])
     indexed = 0
     created = False
     for start in range(0, len(documents), batch_size):
@@ -30,7 +34,7 @@ async def build_index(
             size = vector_size if vector_size is not None else len(vectors[0])
             index.create(vector_size=size)
             created = True
-        index.upsert(batch, vectors)
+        index.upsert(batch, vectors, avgdl=avgdl)
         indexed += len(batch)
     return indexed
 

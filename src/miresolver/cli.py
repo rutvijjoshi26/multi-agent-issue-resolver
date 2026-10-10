@@ -36,7 +36,11 @@ from miresolver.models.chat import ChatError
 from miresolver.models.embedding import EmbeddingError
 from miresolver.models.factory import build_embedder
 from miresolver.models.settings import ModelConfigError, load_model_settings
-from miresolver.retrieval.index import IssueIndex, default_collection_name
+from miresolver.retrieval.index import (
+    IssueIndex,
+    KeywordIndexMissing,
+    default_collection_name,
+)
 from miresolver.retrieval.loader import load_documents
 from miresolver.retrieval.pipeline import build_index, search
 from miresolver.rules import CandidateIssue, CandidatePR
@@ -521,7 +525,7 @@ def main(argv: list[str] | None = None) -> int:
             return _run_evaluate(args)
         except (
             ModelConfigError, EmbeddingError, ConfigError, ChatError,
-            EvaluationError, CodeReadError,
+            EvaluationError, CodeReadError, KeywordIndexMissing,
         ) as exc:
             print(f"{args.command} failed: {exc}", file=sys.stderr)
             return 1
@@ -544,7 +548,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.command in ("index", "search"):
         try:
             return _run_index(args) if args.command == "index" else _run_search(args)
-        except (ModelConfigError, EmbeddingError, ConfigError) as exc:
+        except (
+            ModelConfigError, EmbeddingError, ConfigError, KeywordIndexMissing,
+        ) as exc:
             print(f"{args.command} failed: {exc}", file=sys.stderr)
             return 1
 

@@ -250,3 +250,22 @@ def test_search_closes_the_embedder_on_the_loop_that_used_it(tmp_path, monkeypat
     assert main(["search", "anything", "--models", str(models)]) == 0
     assert embedder.used_on is not None
     assert embedder.closed_on is embedder.used_on
+
+
+def test_search_on_a_pre_bm25_collection_asks_for_a_reindex(tmp_path, capsys, monkeypatch):
+    from miresolver.retrieval.index import KeywordIndexMissing
+
+    models = tmp_path / "models.yaml"
+    models.write_text(MODELS_YAML)
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("K", "secret")
+    monkeypatch.setattr(cli, "build_embedder", lambda settings, env: _LoopRecordingEmbedder())
+    monkeypatch.setattr(cli, "QdrantClient", _FakeQdrantClient)
+
+    async def _legacy_search(query, emb, index, limit):
+        raise KeywordIndexMissing("collection x has no keyword vectors. Re-run `miresolver index`.")
+
+    monkeypatch.setattr(cli, "search", _legacy_search)
+
+    assert main(["search", "anything", "--models", str(models)]) == 1
+    assert "miresolver index" in capsys.readouterr().err
