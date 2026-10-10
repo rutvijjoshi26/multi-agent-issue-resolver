@@ -1,0 +1,30 @@
+# Point any tier at any provider. Nothing here is baked into the code.
+#
+# provider: openai-compatible works with vLLM, Ollama, LM Studio, Together,
+# Groq, Azure OpenAI, and most internal company gateways. Set base_url to
+# your endpoint and api_key_env to the environment variable holding the key.
+#
+# provider: anthropic and provider: gemini talk to those APIs natively.
+#
+# Replace every model id below with one your provider actually serves.
+tiers:
+  embed:
+    provider: openai-compatible
+    base_url: http://localhost:11434/v1
+    model: REPLACE_WITH_YOUR_EMBEDDING_MODEL
+    api_key_env: LOCAL_LLM_API_KEY
+  screen:
+    provider: openai-compatible
+    base_url: http://localhost:11434/v1
+    model: REPLACE_WITH_A_SMALL_FAST_MODEL
+    api_key_env: LOCAL_LLM_API_KEY
+  investigate:
+    provider: openai-compatible
+    base_url: http://localhost:11434/v1
+    model: REPLACE_WITH_A_MID_TIER_MODEL
+    api_key_env: LOCAL_LLM_API_KEY
+  synthesize:
+    provider: openai-compatible
+    base_url: http://localhost:11434/v1
+    model: REPLACE_WITH_YOUR_STRONGEST_MODEL
+    api_key_env: LOCAL_LLM_API_KEY

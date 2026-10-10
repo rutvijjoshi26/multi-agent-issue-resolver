@@ -1,0 +1,56 @@
+from collections.abc import Sequence
+
+from miresolver.models.embedding import EmbeddingClient
+from miresolver.retrieval.documents import IssueDocument
+from miresolver.retrieval.index import IssueIndex, SearchHit, fuse
+
+
+async def build_index(
+    documents: Sequence[IssueDocument],
+    embedder: EmbeddingClient,
+    index: IssueIndex,
+    *,
+    batch_size: int = 64,
+    vector_size: int | None = None,
+) -> int:
+    """Embed every document and write it to the index.
+
+    The vector size comes from the first batch rather than a constant,
+    because it is a property of whichever model the user configured.
+    """
+    if not documents:
+        return 0
+
+    indexed = 0
+    created = False
+    for start in range(0, len(documents), batch_size):
+        batch = list(documents[start : start + batch_size])
+        vectors = await embedder.embed([doc.embed_text for doc in batch])
+        if not created:
+            size = vector_size if vector_size is not None else len(vectors[0])
+            index.create(vector_size=size)
+            created = True
+        index.upsert(batch, vectors)
+        indexed += len(batch)
+    return indexed
+
+
+async def search(
+    query: str,
+    embedder: EmbeddingClient,
+    index: IssueIndex,
+    *,
+    limit: int = 10,
+) -> list[SearchHit]:
+    """Dense and keyword search over the same query, fused by rank.
+
+    A never-created collection (e.g. an empty corpus was indexed and nothing
+    was ever written) is treated as an empty index rather than an error: the
+    caller gets no hits back instead of a raw "collection not found" failure.
+    """
+    if not index.exists():
+        return []
+    vectors = await embedder.embed([query])
+    dense = index.search_dense(vectors[0], limit=limit)
+    keyword = index.search_keyword(query, limit=limit)
+    return fuse(dense, keyword, limit=limit)

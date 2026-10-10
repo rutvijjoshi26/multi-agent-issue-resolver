@@ -1,0 +1,94 @@
+{
+  "data": {
+    "repository": {
+      "issues": {
+        "pageInfo": {
+          "hasNextPage": true,
+          "endCursor": "Y3Vyc29yOnYyOpHOAA"
+        },
+        "nodes": [
+          {
+            "number": 4821,
+            "title": "crash when config file is empty",
+            "body": "Opening an empty settings file crashes the window.",
+            "labels": {
+              "nodes": [
+                {
+                  "name": "bug"
+                }
+              ]
+            },
+            "closedByPullRequestsReferences": {
+              "pageInfo": {
+                "hasNextPage": false
+              },
+              "nodes": [
+                {
+                  "number": 4830,
+                  "merged": true,
+                  "title": "fix parser crash on empty input",
+                  "files": {
+                    "nodes": [
+                      {
+                        "path": "src/config/parser.ts"
+                      }
+                    ]
+                  },
+                  "mergeCommit": {
+                    "parents": {
+                      "nodes": [
+                        {
+                          "oid": "9f1c2ab7d3e4f50617283940abcdef1234567890"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "number": 4900,
+            "title": "tooltip flickers on hover",
+            "body": "The tooltip flickers when the pointer enters from below.",
+            "labels": {
+              "nodes": [
+                {
+                  "name": "bug"
+                }
+              ]
+            },
+            "closedByPullRequestsReferences": {
+              "pageInfo": {
+                "hasNextPage": true
+              },
+              "nodes": [
+                {
+                  "number": 4901,
+                  "merged": true,
+                  "title": "stop tooltip flicker",
+                  "files": {
+                    "nodes": [
+                      {
+                        "path": "src/ui/tooltip.ts"
+                      }
+                    ]
+                  },
+                  "mergeCommit": {
+                    "parents": {
+                      "nodes": [
+                        {
+                          "oid": "1111111111111111111111111111111111111111"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}
