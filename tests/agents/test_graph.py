@@ -209,3 +209,12 @@ def test_retrieve_candidates_applies_the_same_filters_as_the_graph():
     ))
     assert [c.issue_number for c in found] == [3, 4]
     assert [c.retrieval_rank for c in found] == [0, 1]
+
+
+def test_min_agreement_reaches_the_synthesizer_and_is_recorded():
+    # Each investigator names only its own precedent's file, so no file is
+    # backed by more than one of them.
+    d = deps([hit(1), hit(2)], options=ResolverOptions(min_agreement=2))
+    result = asyncio.run(resolve(ISSUE, d))
+    assert result.abstained and result.abstain_reason == "insufficient_agreement"
+    assert result.agreement == 1

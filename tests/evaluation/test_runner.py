@@ -295,3 +295,15 @@ def test_case_lines_record_each_candidates_changed_files(tmp_path):
     assert line["candidates"] == [
         {"issue_number": 7, "pr_number": 70, "changed_files": ["src/a.ts"]}
     ]
+
+
+def test_case_lines_record_agreement(tmp_path):
+    from dataclasses import replace as dc_replace
+
+    cases = select_cases(MANIFEST, which="dev", limit=1, seed=1)
+
+    async def resolver(issue, exclude):
+        return dc_replace(resolution([]), agreement=2)
+
+    out = run(cases, resolver, tmp_path)
+    assert json.loads((out / "cases.jsonl").read_text())["agreement"] == 2

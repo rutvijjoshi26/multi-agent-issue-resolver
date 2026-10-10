@@ -89,3 +89,29 @@ def test_cli_calibrate_needs_an_always_answer_run(tmp_path, capsys):
 
     assert main(["calibrate", str(write_run(tmp_path, mode="abstain"))]) == 1
     assert "always-answer" in capsys.readouterr().err
+
+
+def test_agreement_is_read_from_the_record_and_can_gate_answers():
+    rec = case(True, [(True, 0.9)], 0.9)
+    rec["agreement"] = 2
+    signal = load_signals([rec])[0]
+    assert signal.agreement == 2
+    assert would_answer(signal, verdict_threshold=0.5, synthesis_threshold=0.5,
+                        min_agreement=2)
+    assert not would_answer(signal, verdict_threshold=0.5, synthesis_threshold=0.5,
+                            min_agreement=3)
+
+
+def test_the_search_covers_agreement_levels():
+    agreeing = [dict(case(True, [(True, 0.8)], 0.8), agreement=3)] * 2
+    lone = [dict(case(False, [(True, 0.8)], 0.8), agreement=1)] * 3
+    choice = choose_thresholds(load_signals(agreeing + lone), grid=[0.5])
+    assert choice["min_agreement"] >= 2 and choice["answered"] == 2
+
+
+def test_agreement_is_recomputed_for_records_that_predate_the_field():
+    rec = case(True, [(True, 0.9), (True, 0.8), (False, 0.3)], 0.9)
+    rec["predicted_files"] = ["a.ts", "b.ts"]
+    for v, files in zip(rec["verdicts"], (["a.ts"], ["c.ts", "a.ts"], ["b.ts"])):
+        v["files"] = files
+    assert load_signals([rec])[0].agreement == 2

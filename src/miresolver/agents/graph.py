@@ -171,6 +171,7 @@ def build_graph(deps: ResolverDeps) -> Any:
             threshold=options.abstain_threshold,
             synthesis_threshold=options.synthesis_threshold,
             always_answer=options.always_answer,
+            min_agreement=options.min_agreement,
         )
         return {
             "synthesis": result,
@@ -241,5 +242,6 @@ async def resolve(
         abstained=synthesis.abstained,
         abstain_reason=synthesis.reason,
         synthesis_fallback=synthesis.fallback,
+        agreement=synthesis.agreement,
         **common,
     )

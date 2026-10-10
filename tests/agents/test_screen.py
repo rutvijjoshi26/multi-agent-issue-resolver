@@ -81,3 +81,13 @@ def test_non_finite_numbers_in_scores_are_skipped_not_fatal():
     chat = ScriptedChat(['{"scores": [{"issue": 1e999, "score": 1}, {"issue": 2, "score": 1e999}]}'])
     kept, _ = asyncio.run(screen(ISSUE, candidates(4, 2), chat, top_n=2, floor=0.5))
     assert [(c.issue_number, c.screen_score) for c in kept] == [(2, 1.0)]
+
+
+def test_the_screen_prompt_shows_the_files_each_past_fix_changed():
+    # The paths name the component a fix lived in, which the symptom text
+    # often leaves implicit.
+    chat = ScriptedChat([{"scores": []}])
+    cands = [Candidate.from_hit(hit(7, files=("src/vs/terminal/a.ts",)), 0)]
+    asyncio.run(screen(ISSUE, cands, chat, top_n=3, floor=0.2))
+    prompt = chat.calls[0]["messages"][0]["content"]
+    assert "src/vs/terminal/a.ts" in prompt

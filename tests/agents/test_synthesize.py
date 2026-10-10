@@ -149,3 +149,28 @@ def test_the_synthesis_gate_can_be_set_apart_from_the_verdict_gate():
                                     threshold=0.5, synthesis_threshold=0.7))
     assert not loose.abstained
     assert strict.abstained and strict.reason == "low_synthesis_confidence"
+
+
+def test_agreement_counts_investigators_naming_a_top_three_file():
+    from miresolver.agents.synthesize import agreement
+
+    vs = [verdict(1, files=("a.ts", "b.ts")), verdict(2, files=("b.ts",)),
+          verdict(3, files=("x.ts", "y.ts", "z.ts", "a.ts")), verdict(4, error="t")]
+    assert agreement(("b.ts", "a.ts", "q.ts"), vs) == 2
+    # Only an investigator's own first three files count.
+    assert agreement(("z.ts",), vs) == 1
+    assert agreement(("q.ts",), vs) == 0
+
+
+def test_too_little_agreement_abstains():
+    reply = {"approach": "a", "files": ["a.ts"], "cited_issues": [1], "confidence": 0.9}
+    vs = [verdict(1, files=("a.ts",)), verdict(2, files=("b.ts",))]
+    ok = asyncio.run(synthesize(ISSUE, vs, ScriptedChat([reply]), threshold=0.5,
+                                min_agreement=1))
+    low = asyncio.run(synthesize(ISSUE, vs, ScriptedChat([reply]), threshold=0.5,
+                                 min_agreement=2))
+    assert not ok.abstained and ok.agreement == 1
+    assert low.abstained and low.reason == "insufficient_agreement"
+    always = asyncio.run(synthesize(ISSUE, vs, ScriptedChat([reply]), threshold=0.5,
+                                    min_agreement=2, always_answer=True))
+    assert not always.abstained and always.reason == "insufficient_agreement"

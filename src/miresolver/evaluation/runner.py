@@ -145,7 +145,7 @@ def estimate_cost(
         "screen": (
             _tokens(
                 len(SCREEN_SYSTEM) + PROMPT_OVERHEAD_CHARS + issue
-                + options.retrieve_k * (options.candidate_body_chars + 200)
+                + options.retrieve_k * (options.candidate_body_chars + 500)
             ),
             SCREEN_MAX_TOKENS,
         ),
@@ -229,6 +229,7 @@ def _resolution_fields(res: Resolution) -> dict:
             for v in res.verdicts
         ],
         "synthesis_fallback": res.synthesis_fallback,
+        "agreement": res.agreement,
         "unmetered_calls": res.unmetered_calls,
         "tokens": {t: asdict(u) for t, u in res.usage.items()},
     }

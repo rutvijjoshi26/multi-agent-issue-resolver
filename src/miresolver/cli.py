@@ -360,7 +360,7 @@ def _run_calibrate(args: argparse.Namespace) -> int:
             "synthesized and its confidences recorded"
         )
     chosen = choose_thresholds(signals)
-    default = evaluate_thresholds(signals, 0.5, 0.5)
+    default = evaluate_thresholds(signals, 0.5, 0.5, 0)
     print(json.dumps({"run": str(args.run), "objective":
                       "maximise answered_correct - answered_wrong; ties: more "
                       "answers, then lower thresholds",
@@ -376,6 +376,7 @@ def _options(args: argparse.Namespace) -> ResolverOptions:
         synthesis_threshold=args.synthesis_threshold,
         investigator_timeout_s=args.investigator_timeout,
         always_answer=args.mode == "always-answer",
+        min_agreement=args.min_agreement,
         retrieval=args.retrieval,
     )
 
@@ -563,6 +564,10 @@ def _add_runtime_flags(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--synthesis-threshold", type=float, default=None,
         help="minimum synthesizer confidence to answer; defaults to --abstain-threshold",
+    )
+    parser.add_argument(
+        "--min-agreement", type=int, default=0,
+        help="investigators that must name one of the top three files to answer",
     )
     parser.add_argument(
         "--mode", choices=("abstain", "always-answer"), default="abstain",

@@ -105,6 +105,8 @@ class Resolution:
     #: Model calls whose token usage is unknown (an investigator that timed
     #: out or crashed may still have been billed), so spend is a floor.
     unmetered_calls: int = 0
+    #: Most investigators backing any one of the top three files.
+    agreement: int = 0
 
 
 @dataclass(frozen=True)
@@ -119,6 +121,9 @@ class ResolverOptions:
     #: Never abstain. Used to report coverage-style metrics alongside the
     #: abstaining mode; the would-be abstention reason is still recorded.
     always_answer: bool = False
+    #: Minimum number of investigators that must independently name one of
+    #: the top three files for the system to answer.
+    min_agreement: int = 0
     #: "hybrid" (dense and BM25 fused by rank), "dense" or "keyword".
     retrieval: str = "hybrid"
     investigator_timeout_s: float = 90.0

@@ -12,10 +12,14 @@ ISSUE_BODY_CHARS = 4000
 
 SCREEN_SYSTEM = (
     "You triage bug reports for a large software repository. You are shown "
-    "a new bug report and a list of previously solved issues. Score how "
-    "likely each past issue shares the new report's root cause, from 0 "
-    "(unrelated) to 1 (almost certainly the same bug). Judge the underlying "
-    "cause, not surface wording. Reply with JSON only, shaped as "
+    "a new bug report and a list of previously solved issues, each with the "
+    "files its fix changed. Score how likely each past fix points at the "
+    "code that must change for the new report, from 0 (unrelated) to 1 "
+    "(almost certainly the same code). Judge the underlying cause and the "
+    "component involved, not surface wording: the changed file paths show "
+    "which part of the product each past fix lived in, so a past issue in "
+    "the same feature area as the new report should score above one that "
+    "merely shares words with it. Reply with JSON only, shaped as "
     '{"scores": [{"issue": <number>, "score": <0..1>}]}, with one entry per '
     "past issue."
 )
@@ -27,10 +31,18 @@ INVESTIGATE_SYSTEM = (
     "content of those files at the commit the new bug is reported against. "
     "Decide whether the precedent applies to the new bug, which files in "
     "the current code would most likely need to change, and what approach "
-    "to take. Only name files that exist in the repository; you may name "
-    "files beyond the precedent's if the code shows the logic has moved. Be "
-    "calibrated: a confidence of 0.5 should mean you expect to be right "
-    "half the time. Reply with JSON only, shaped as "
+    "to take. The precedent applies only if the new bug is in the same "
+    "component and its likely fix touches the same code; a similar symptom "
+    "in a different feature does not count. List at most five files, the "
+    "single most likely file first, and prefer the file whose logic the "
+    "report implicates over files that merely call it. Even when the "
+    "precedent does not apply, still list the files from the code shown "
+    "that are most likely involved, if any. Only name files that exist in "
+    "the repository; you may name files beyond the precedent's if the code "
+    "shows the logic has moved. confidence is the probability that one of "
+    "your first three files is a file the real fix will change; be "
+    "calibrated, so 0.5 means you expect to be right half the time. Reply "
+    "with JSON only, shaped as "
     '{"applies": <bool>, "confidence": <0..1>, "files": [<path>, ...], '
     '"approach": <string>, "reasoning": <string>}.'
 )
@@ -39,7 +51,10 @@ SYNTHESIZE_SYSTEM = (
     "You combine investigator reports into one recommendation for fixing a "
     "new bug. Weigh each report by its confidence and evidence, merge "
     "overlapping file suggestions, and rank files with the most likely "
-    "first. Cite only the past issues whose reports you relied on. If the "
+    "first: a file named by several confident reports outranks one named "
+    "by a single report. List at most five files. Cite only the past issues "
+    "whose reports you relied on. confidence is the probability that one of "
+    "your first three files is a file the real fix will change. If the "
     "reports do not support a confident recommendation, give a low "
     "confidence rather than guessing. Reply with JSON only, shaped as "
     '{"approach": <string>, "files": [<path>, ...], '
@@ -57,6 +72,7 @@ def screen_prompt(
     lines = ["NEW BUG REPORT", _issue_block(issue), "", "PAST SOLVED ISSUES"]
     for c in candidates:
         lines.append(f"#{c.issue_number}: {c.title}")
+        lines.append("Fix changed: " + (", ".join(c.changed_files) or "(unknown)"))
         lines.append(c.body[:body_chars].replace("\n", " "))
         lines.append("")
     return "\n".join(lines)

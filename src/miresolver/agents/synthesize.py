@@ -21,6 +21,9 @@ class SynthesisResult:
     #: True when the synthesis call failed and the answer was merged from
     #: the verdicts directly.
     fallback: bool = False
+    #: Most investigators that independently named any one of the top
+    #: three suggested files; see agreement().
+    agreement: int = 0
 
 
 def merge_verdict_files(verdicts: Sequence[Verdict]) -> list[str]:
@@ -34,6 +37,24 @@ def merge_verdict_files(verdicts: Sequence[Verdict]) -> list[str]:
             weight[path] = weight.get(path, 0.0) + v.confidence
     order = {path: i for i, path in enumerate(weight)}
     return sorted(weight, key=lambda p: (-weight[p], order[p]))
+
+
+AGREEMENT_DEPTH = 3
+
+
+def agreement(files: Sequence[str], verdicts: Sequence[Verdict]) -> int:
+    """How many investigators independently back the answer.
+
+    The largest number of usable verdicts that list any one of the first
+    three suggested files among their own first three. Investigators see
+    different precedents, so agreement between them is evidence the
+    model's stated confidence does not carry.
+    """
+    tops = [set(v.files[:AGREEMENT_DEPTH]) for v in verdicts if not v.failed]
+    return max(
+        (sum(path in top for top in tops) for path in files[:AGREEMENT_DEPTH]),
+        default=0,
+    )
 
 
 def _cite(verdicts: Sequence[Verdict]) -> tuple[Citation, ...]:
@@ -56,6 +77,7 @@ async def synthesize(
     threshold: float,
     synthesis_threshold: float | None = None,
     always_answer: bool = False,
+    min_agreement: int = 0,
 ) -> SynthesisResult:
     """Merge investigator verdicts into one answer, or abstain.
 
@@ -64,7 +86,8 @@ async def synthesize(
     its prose still cannot answer without a confident precedent behind it:
     the system abstains when no applicable verdict reaches `threshold`, or
     when the synthesizer's confidence is below `synthesis_threshold`
-    (which defaults to `threshold`).
+    (which defaults to `threshold`), or when fewer than `min_agreement`
+    investigators back one of the top three files.
 
     With always_answer the synthesizer is consulted whenever any verdict
     is usable and the result is never an abstention; `reason` still
@@ -84,14 +107,16 @@ async def synthesize(
     )
     if not confident and not always_answer:
         best = max(usable, key=lambda v: (v.applies, v.confidence))
+        would_be = _would_be_files(usable)
         return SynthesisResult(
             approach=best.approach,
-            files=_would_be_files(usable),
+            files=would_be,
             citations=_cite([v for v in usable if v.applies]),
             confidence=max((v.confidence for v in usable if v.applies), default=0.0),
             abstained=True,
             reason="no_confident_precedent",
             usage=Usage(),
+            agreement=agreement(would_be, usable),
         )
 
     ranked = sorted(usable, key=lambda v: (not v.applies, -v.confidence))
@@ -116,15 +141,24 @@ async def synthesize(
         except ValueError as exc:
             raise ChatError(f"synthesis confidence invalid: {exc}") from exc
     except Exception:  # any synthesis failure falls back to the verdicts
+        files = tuple(merge_verdict_files(confident)) if confident else fallback_files
+        backing = agreement(files, usable)
+        if not confident:
+            reason = "no_confident_precedent"
+        elif backing < min_agreement:
+            reason = "insufficient_agreement"
+        else:
+            reason = None
         return SynthesisResult(
             approach=strongest.approach,
-            files=tuple(merge_verdict_files(confident)) if confident else fallback_files,
+            files=files,
             citations=_cite(confident or [v for v in usable if v.applies]),
             confidence=strongest.confidence if strongest.applies else 0.0,
-            abstained=False,
-            reason=None if confident else "no_confident_precedent",
+            abstained=reason is not None and not always_answer,
+            reason=reason,
             usage=usage,
             fallback=True,
+            agreement=backing,
         )
 
     by_number = {v.issue_number: v for v in usable}
@@ -138,18 +172,23 @@ async def synthesize(
         if v is not None and v not in cited:
             cited.append(v)
 
+    files = clean_paths(data.get("files")) or fallback_files
+    backing = agreement(files, usable)
     if not confident:
         reason = "no_confident_precedent"
     elif confidence < gate:
         reason = "low_synthesis_confidence"
+    elif backing < min_agreement:
+        reason = "insufficient_agreement"
     else:
         reason = None
     return SynthesisResult(
         approach=str(data.get("approach") or strongest.approach),
-        files=clean_paths(data.get("files")) or fallback_files,
+        files=files,
         citations=_cite(cited or confident),
         confidence=confidence,
         abstained=reason is not None and not always_answer,
         reason=reason,
         usage=usage,
+        agreement=backing,
     )
