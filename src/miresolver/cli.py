@@ -558,15 +558,15 @@ def _add_runtime_flags(parser: argparse.ArgumentParser) -> None:
         help="read code from this local clone with git instead of fetching it",
     )
     parser.add_argument("--code-cache", type=Path, default=DEFAULT_CODE_CACHE)
-    parser.add_argument("--retrieve-k", type=int, default=10)
+    parser.add_argument("--retrieve-k", type=int, default=20)
     parser.add_argument("--investigators", type=int, default=3)
-    parser.add_argument("--abstain-threshold", type=float, default=0.5)
+    parser.add_argument("--abstain-threshold", type=float, default=0.85)
     parser.add_argument(
-        "--synthesis-threshold", type=float, default=None,
-        help="minimum synthesizer confidence to answer; defaults to --abstain-threshold",
+        "--synthesis-threshold", type=float, default=0.9,
+        help="minimum synthesizer confidence to answer",
     )
     parser.add_argument(
-        "--min-agreement", type=int, default=0,
+        "--min-agreement", type=int, default=2,
         help="investigators that must name one of the top three files to answer",
     )
     parser.add_argument(

@@ -38,12 +38,14 @@ def screen_all(prompt):
 def verdict(conf):
     def respond(prompt):
         n = int(re.search(r"PAST ISSUE #(\d+)", prompt).group(1))
-        return {"applies": True, "confidence": conf, "files": [f"src/f{n}.ts"],
+        # Every investigator also names src/f1.ts, so they agree on it.
+        return {"applies": True, "confidence": conf,
+                "files": list(dict.fromkeys(["src/f1.ts", f"src/f{n}.ts"])),
                 "approach": "guard it", "reasoning": "r"}
     return respond
 
 
-def install_fake_runtime(monkeypatch, *, conf=0.9, synth_conf=0.8, hits=None):
+def install_fake_runtime(monkeypatch, *, conf=0.9, synth_conf=0.95, hits=None):
     built = {}
 
     @contextlib.asynccontextmanager
@@ -156,7 +158,9 @@ def test_evaluate_runs_and_writes_results(models, tmp_path, monkeypatch, capsys)
     summary = json.loads((run_dir / "summary.json").read_text())
     assert summary["counts"]["scored"] == 3
     assert summary["run"]["manifest_generated_at"] == "g"
-    assert summary["run"]["options"]["retrieve_k"] == 10
+    # The CLI defaults are the configuration tuned on the v2 dev set.
+    assert summary["run"]["options"]["retrieve_k"] == 20
+    assert summary["run"]["options"]["min_agreement"] == 2
     assert summary["models"]["synthesize"]["model"] == "big"
     assert str(run_dir) in capsys.readouterr().out
 
