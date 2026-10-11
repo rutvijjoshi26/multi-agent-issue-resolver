@@ -71,3 +71,19 @@ def test_readme_status_no_longer_says_agents_are_unbuilt():
     text = README.read_text()
     assert "not built yet" not in text
     assert "eval/results" in text
+
+
+def test_readme_documents_the_benchmark_calibration_and_mode_flags():
+    text = README.read_text()
+    for flag in (
+        "miresolver benchmark", "--test-size", "--dev-size", "--exclude-run",
+        "miresolver calibrate", "--final", "--mode", "always-answer",
+        "--synthesis-threshold", "--min-agreement", "--retrieval",
+        "--retrieval-only", "--tag", "eval/manifest.v2.json",
+        "docs/evaluation-integrity.md",
+    ):
+        assert flag in text, f"undocumented: {flag}"
+
+
+def test_readme_has_no_em_dashes():
+    assert "—" not in README.read_text()

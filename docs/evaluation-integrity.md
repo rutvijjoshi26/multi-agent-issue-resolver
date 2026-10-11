@@ -54,6 +54,14 @@ October 10 exactly, including every rejection count.
 - The held-out test set was evaluated once per mode (abstaining and
   always-answer) with the final configuration, after tuning ended. No
   change was made after seeing those results.
+- Two test runs did not complete and were discarded as incomplete; no
+  configuration was changed in response to them. The first always-answer
+  run (2026-10-11T00:12Z) lost network access, so 78 of its 100 cases
+  failed with an embedding error. The first abstaining run
+  (2026-10-11T19:17Z) stopped writing results after 60 cases and was
+  killed 40 minutes later; the cause was not confirmed. Each mode was then
+  rerun once from scratch with an unchanged configuration, and those
+  reruns are the reported results.
 - Every metric the runner produces is reported, including poor ones.
 
 ## Known weaknesses of this protocol
