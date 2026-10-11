@@ -1,0 +1,41 @@
+{
+  "counts": {
+    "scored": 100,
+    "selected": 100,
+    "skipped_no_text": 0
+  },
+  "precedent_available_at": {
+    "1": 0.11,
+    "10": 0.39,
+    "20": 0.45,
+    "3": 0.21,
+    "40": 0.52,
+    "5": 0.31
+  },
+  "run": {
+    "limit": null,
+    "manifest": "eval/manifest.v2.json",
+    "manifest_created_at": "2026-10-10T23:18:29+00:00",
+    "manifest_generated_at": null,
+    "manifest_seed": 20261010,
+    "manifest_version": 2,
+    "mode": "abstain",
+    "options": {
+      "abstain_threshold": 0.5,
+      "always_answer": false,
+      "candidate_body_chars": 600,
+      "file_char_budget": 6000,
+      "investigate_n": 3,
+      "investigator_timeout_s": 90.0,
+      "max_files_per_candidate": 5,
+      "retrieval": "dense",
+      "retrieve_k": 10,
+      "screen_floor": 0.2,
+      "synthesis_threshold": null
+    },
+    "seed": 20260921,
+    "set": "dev",
+    "tag": "dense",
+    "test_sha256": null
+  }
+}

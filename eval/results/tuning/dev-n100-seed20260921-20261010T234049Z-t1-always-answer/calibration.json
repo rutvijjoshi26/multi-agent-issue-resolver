@@ -1,0 +1,30 @@
+{
+  "run": "eval/results/tuning/dev-n100-seed20260921-20261010T234049Z-t1-always-answer",
+  "objective": "maximise answered_correct - answered_wrong; ties: more answers, then lower thresholds",
+  "chosen": {
+    "verdict_threshold": 0.85,
+    "synthesis_threshold": 0.9,
+    "min_agreement": 2,
+    "cases": 100,
+    "answered": 25,
+    "answered_correct": 14,
+    "answered_wrong": 11,
+    "net": 3,
+    "abstention_rate": 0.75,
+    "accuracy_when_answering": 0.56,
+    "confident_wrong_rate": 0.11
+  },
+  "default_0.5_0.5": {
+    "verdict_threshold": 0.5,
+    "synthesis_threshold": 0.5,
+    "min_agreement": 0,
+    "cases": 100,
+    "answered": 72,
+    "answered_correct": 26,
+    "answered_wrong": 46,
+    "net": -20,
+    "abstention_rate": 0.28,
+    "accuracy_when_answering": 0.3611,
+    "confident_wrong_rate": 0.46
+  }
+}
