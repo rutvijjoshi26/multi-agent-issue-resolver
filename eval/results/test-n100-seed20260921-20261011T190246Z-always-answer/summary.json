@@ -1,0 +1,154 @@
+{
+  "counts": {
+    "errors": 0,
+    "not_run": 0,
+    "scored": 100,
+    "selected": 100,
+    "skipped_no_text": 0
+  },
+  "metrics": {
+    "abstention_rate": 0.0,
+    "accuracy_when_answering": 0.4,
+    "all_cases": {
+      "cases": 100,
+      "hit_at_1": 0.3,
+      "hit_at_3": 0.4,
+      "precision_at_3": 0.18,
+      "recall_at_3": 0.2677
+    },
+    "answered": {
+      "cases": 100,
+      "hit_at_1": 0.3,
+      "hit_at_3": 0.4,
+      "precision_at_3": 0.18,
+      "recall_at_3": 0.2677
+    },
+    "cases": 100,
+    "confident_wrong_rate": 0.6,
+    "correct_abstention_rate": null,
+    "latency_s": {
+      "median": 8.427,
+      "p95": 10.595
+    },
+    "precedent_available_rate": 0.49,
+    "with_precedent": {
+      "abstention_rate": 0.0,
+      "cases": 49,
+      "hit_at_3": 0.6939
+    },
+    "without_precedent": {
+      "abstention_rate": 0.0,
+      "cases": 51,
+      "hit_at_3": 0.1176
+    }
+  },
+  "models": {
+    "embed": {
+      "model": "text-embedding-3-small",
+      "provider": "openai-compatible"
+    },
+    "investigate": {
+      "model": "gpt-4.1-mini",
+      "provider": "openai-compatible"
+    },
+    "screen": {
+      "model": "gpt-4.1-mini",
+      "provider": "openai-compatible"
+    },
+    "synthesize": {
+      "model": "gpt-4.1",
+      "provider": "openai-compatible"
+    }
+  },
+  "run": {
+    "estimate": {
+      "assumption": "upper bound: full prompt budgets, full reply caps, 4 characters per token",
+      "cases": 100,
+      "priced_dollars": 3.43424,
+      "tiers": {
+        "embed": {
+          "dollars": 0.004,
+          "input_tokens": 200000,
+          "model": "text-embedding-3-small",
+          "output_tokens": 0
+        },
+        "investigate": {
+          "dollars": 1.67688,
+          "input_tokens": 3112200,
+          "model": "gpt-4.1-mini",
+          "output_tokens": 270000
+        },
+        "screen": {
+          "dollars": 0.37296,
+          "input_tokens": 692400,
+          "model": "gpt-4.1-mini",
+          "output_tokens": 60000
+        },
+        "synthesize": {
+          "dollars": 1.3804,
+          "input_tokens": 330200,
+          "model": "gpt-4.1",
+          "output_tokens": 90000
+        }
+      },
+      "unpriced_tiers": []
+    },
+    "finished_at": "2026-10-11T19:16:51+00:00",
+    "limit": null,
+    "manifest": "eval/manifest.v2.json",
+    "manifest_created_at": "2026-10-10T23:18:29+00:00",
+    "manifest_generated_at": null,
+    "manifest_seed": 20261010,
+    "manifest_version": 2,
+    "mode": "always-answer",
+    "options": {
+      "abstain_threshold": 0.85,
+      "always_answer": true,
+      "candidate_body_chars": 600,
+      "file_char_budget": 6000,
+      "investigate_n": 3,
+      "investigator_timeout_s": 90.0,
+      "max_files_per_candidate": 5,
+      "min_agreement": 2,
+      "retrieval": "hybrid",
+      "retrieve_k": 20,
+      "screen_floor": 0.2,
+      "synthesis_threshold": 0.9
+    },
+    "seed": 20260921,
+    "set": "test",
+    "started_at": "2026-10-11T19:02:46+00:00",
+    "tag": "always-answer",
+    "test_sha256": "73c4101a7c6b0c3fa1e6a2090a3b0e38779e2ab6cc75924ce037f4c531c63e21"
+  },
+  "spend": {
+    "max_cost": 2.5,
+    "note": "priced_total is a floor: query embeddings, error cases and timed-out or crashed model calls are not metered; see the estimate for an upper bound",
+    "priced_total": 1.522462,
+    "tiers": {
+      "investigate": 0.756722,
+      "screen": 0.268508,
+      "synthesize": 0.497232
+    },
+    "unmetered": {
+      "error_cases": 0,
+      "model_calls": 0
+    },
+    "unpriced_tiers": []
+  },
+  "stopped_early": false,
+  "tokens": {
+    "investigate": {
+      "input_tokens": 1486068,
+      "output_tokens": 101434
+    },
+    "screen": {
+      "input_tokens": 564007,
+      "output_tokens": 26816
+    },
+    "synthesize": {
+      "input_tokens": 159156,
+      "output_tokens": 22365
+    }
+  }
+}
