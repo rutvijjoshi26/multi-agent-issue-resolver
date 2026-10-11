@@ -18,6 +18,10 @@ from miresolver.models.settings import ModelSettings
 from miresolver.retrieval.index import IssueIndex
 from miresolver.retrieval.pipeline import search
 
+#: Seconds per Qdrant request. The client default of 5 turned brief server
+#: stalls into failed evaluation cases.
+QDRANT_TIMEOUT_S = 60
+
 
 @contextlib.asynccontextmanager
 async def open_runtime(
@@ -46,7 +50,7 @@ async def open_runtime(
             else GitHubRawCodeReader(repo, code_cache)
         )
         closers.append(reader)
-        qdrant = QdrantClient(url=qdrant_url)
+        qdrant = QdrantClient(url=qdrant_url, timeout=QDRANT_TIMEOUT_S)
         index = IssueIndex(qdrant, collection=collection)
 
         async def retrieve(query: str, limit: int):
